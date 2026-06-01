@@ -1,0 +1,3028 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GrantTrack — University Financial Management</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--white:#fff;--off-white:#f8f8f6;--gray-50:#f4f4f2;--gray-100:#e8e8e4;--gray-200:#d0d0ca;--gray-400:#9a9a92;--gray-600:#5a5a54;--gray-800:#2a2a26;--ink:#1a1a16;--accent:#1a4a7a;--accent-light:#e8f0f8;--accent-mid:#3a72b0;--green:#1a6a3a;--green-light:#e8f5ed;--amber:#7a4a0a;--amber-light:#fdf3e3;--red:#7a1a1a;--red-light:#fdf0f0;--teal:#0a5a6a;--teal-light:#e3f4f7;--purple:#4a1a7a;--purple-light:#f0e8f8;--border:1.5px solid var(--gray-100);}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'DM Sans',sans-serif;background:var(--white);color:var(--ink);min-height:100vh;font-size:14px;}
+.app{display:flex;min-height:100vh;}
+
+/* SIDEBAR */
+.sidebar{width:260px;min-width:260px;background:var(--ink);color:#fff;display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:100;overflow-y:auto;}
+.sidebar-logo{padding:26px 24px 18px;border-bottom:1px solid rgba(255,255,255,0.1);}
+.sidebar-logo h1{font-family:'DM Serif Display',serif;font-size:20px;color:#fff;}
+.sidebar-logo span{font-size:11px;color:rgba(255,255,255,0.4);display:block;margin-top:2px;letter-spacing:.5px;text-transform:uppercase;}
+.sidebar-section{padding:14px 0 6px;}
+.sidebar-section-label{padding:0 24px 7px;font-size:10px;font-weight:600;letter-spacing:1.2px;text-transform:uppercase;color:rgba(255,255,255,0.3);}
+.nav-item{display:flex;align-items:center;gap:10px;padding:8px 24px;cursor:pointer;color:rgba(255,255,255,0.55);font-size:13.5px;transition:all .15s;border-left:2.5px solid transparent;}
+.nav-item:hover{background:rgba(255,255,255,0.05);color:rgba(255,255,255,0.85);}
+.nav-item.active{background:rgba(255,255,255,0.08);color:#fff;border-left-color:#6eb3f5;font-weight:500;}
+.nav-item .icon{font-size:14px;width:18px;text-align:center;}
+.nav-sub{padding-left:14px;}
+.nav-sub .nav-item{font-size:12.5px;padding:6px 24px 6px 36px;color:rgba(255,255,255,0.45);}
+.nav-sub .nav-item:hover{color:rgba(255,255,255,0.75);}
+.nav-sub .nav-item.active{color:#fff;border-left-color:#6eb3f5;}
+.sidebar-user{margin-top:auto;padding:14px 24px;border-top:1px solid rgba(255,255,255,0.1);display:flex;align-items:center;gap:10px;}
+.user-avatar{width:32px;height:32px;border-radius:50%;background:var(--accent-mid);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:#fff;flex-shrink:0;}
+.user-info .name{font-size:13px;color:#fff;font-weight:500;}
+.user-info .role{font-size:11px;color:rgba(255,255,255,0.4);}
+
+/* MAIN */
+.main{margin-left:260px;flex:1;display:flex;flex-direction:column;min-height:100vh;}
+.topbar{height:58px;border-bottom:var(--border);display:flex;align-items:center;padding:0 32px;gap:16px;background:var(--white);position:sticky;top:0;z-index:50;}
+.topbar-title{font-family:'DM Serif Display',serif;font-size:19px;color:var(--ink);flex:1;}
+.topbar-actions{display:flex;gap:10px;align-items:center;}
+
+/* BUTTONS */
+.btn{padding:7px 16px;border-radius:6px;font-size:13px;font-family:'DM Sans',sans-serif;font-weight:500;cursor:pointer;border:none;transition:all .15s;display:inline-flex;align-items:center;gap:6px;}
+.btn-primary{background:var(--accent);color:#fff;}
+.btn-primary:hover{background:var(--accent-mid);}
+.btn-secondary{background:var(--gray-50);color:var(--gray-800);border:var(--border);}
+.btn-secondary:hover{background:var(--gray-100);}
+.btn-green{background:var(--green-light);color:var(--green);border:1.5px solid var(--green);}
+.btn-green:hover{background:var(--green);color:#fff;}
+.btn-sm{padding:5px 12px;font-size:12px;}
+
+/* PAGE */
+.page{padding:32px;display:none;}
+.page.active{display:block;}
+
+/* TOTALS ROW */
+.totals-row{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:28px;}
+.totals-card{background:var(--white);border:var(--border);border-radius:10px;padding:16px 18px;}
+.totals-card .lbl{font-size:10px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;color:var(--gray-400);margin-bottom:6px;}
+.totals-card .val{font-family:'DM Mono',monospace;font-size:19px;font-weight:500;color:var(--ink);}
+.totals-card.green .val{color:var(--green);}
+.totals-card.amber .val{color:var(--amber);}
+.totals-card.blue .val{color:var(--accent);}
+.totals-card .sub{font-size:11px;color:var(--gray-400);margin-top:3px;}
+
+/* SECTION HEADER */
+.section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+.section-title{font-family:'DM Serif Display',serif;font-size:16px;color:var(--ink);}
+
+/* PROGRESS */
+.progress-bar{height:5px;background:var(--gray-100);border-radius:10px;overflow:hidden;}
+.progress-fill{height:100%;border-radius:10px;transition:width .3s;}
+.fill-green{background:var(--green);}
+.fill-amber{background:#e8a020;}
+.fill-red{background:#c03030;}
+
+/* TABLES */
+.table-wrap{border:var(--border);border-radius:10px;overflow:hidden;}
+table{width:100%;border-collapse:collapse;}
+thead{background:var(--gray-50);}
+th{padding:9px 13px;text-align:left;font-size:11px;font-weight:600;letter-spacing:.6px;text-transform:uppercase;color:var(--gray-400);border-bottom:var(--border);white-space:nowrap;}
+td{padding:9px 13px;font-size:13px;color:var(--gray-800);border-bottom:1px solid var(--gray-50);vertical-align:middle;}
+tr:last-child td{border-bottom:none;}
+tr:hover td{background:var(--gray-50);}
+.mono{font-family:'DM Mono',monospace;font-size:12px;}
+
+/* BADGES */
+.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:600;white-space:nowrap;}
+.badge-green{background:var(--green-light);color:var(--green);}
+.badge-amber{background:var(--amber-light);color:var(--amber);}
+.badge-red{background:var(--red-light);color:var(--red);}
+.badge-blue{background:var(--accent-light);color:var(--accent);}
+.badge-teal{background:var(--teal-light);color:var(--teal);}
+.badge-gray{background:var(--gray-100);color:var(--gray-600);}
+.badge-purple{background:var(--purple-light);color:var(--purple);}
+
+/* PIPELINE DOTS */
+.pipeline{display:flex;align-items:center;}
+.pip-dot{width:9px;height:9px;border-radius:50%;background:var(--gray-200);border:1.5px solid var(--gray-200);flex-shrink:0;}
+.pip-dot.done{background:var(--green);border-color:var(--green);}
+.pip-line{width:10px;height:2px;background:var(--gray-200);}
+.pip-line.done{background:var(--green);}
+
+/* ═══ PROCUREMENT CHAIN — COMPACT TABLE ═══ */
+.proc-table-wrap{border:var(--border);border-radius:10px;overflow:hidden;}
+.proc-table-wrap table{width:100%;border-collapse:collapse;}
+/* clickable pipeline cell */
+.pip-click{cursor:pointer;display:flex;align-items:center;gap:6px;padding:3px 7px;border-radius:6px;transition:background .12s;}
+.pip-click:hover{background:var(--accent-light);}
+.pip-click .pip-hint{font-size:10px;color:var(--accent);white-space:nowrap;opacity:0;}
+.pip-click:hover .pip-hint{opacity:1;}
+
+/* ═══ CHAIN DETAIL DRAWER (popup panel) ═══ */
+.chain-drawer-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.28);z-index:300;}
+.chain-drawer-overlay.open{display:block;}
+.chain-drawer{position:fixed;top:0;right:0;bottom:0;width:480px;max-width:96vw;background:var(--white);box-shadow:-8px 0 40px rgba(0,0,0,0.14);overflow-y:auto;z-index:301;display:flex;flex-direction:column;transform:translateX(100%);transition:transform .22s ease;}
+.chain-drawer.open{transform:translateX(0);}
+.chain-drawer-header{padding:18px 22px 14px;border-bottom:var(--border);display:flex;justify-content:space-between;align-items:flex-start;position:sticky;top:0;background:var(--white);z-index:1;}
+.chain-drawer-title{font-family:'DM Serif Display',serif;font-size:16px;color:var(--ink);}
+.chain-drawer-meta{font-size:11px;color:var(--gray-400);margin-top:2px;}
+.chain-drawer-close{background:none;border:none;font-size:21px;cursor:pointer;color:var(--gray-400);padding:0 4px;line-height:1;border-radius:4px;}
+.chain-drawer-close:hover{background:var(--gray-100);}
+.chain-drawer-body{padding:20px 22px;flex:1;}
+
+/* STEP ROWS inside drawer */
+.ds-step{display:flex;gap:14px;margin-bottom:4px;}
+.ds-left{display:flex;flex-direction:column;align-items:center;width:28px;flex-shrink:0;}
+.ds-icon{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;border:2px solid var(--gray-200);background:var(--white);color:var(--gray-400);font-weight:700;}
+.ds-icon.done{background:var(--green-light);border-color:var(--green);color:var(--green);}
+.ds-icon.active{background:var(--accent-light);border-color:var(--accent);color:var(--accent);}
+.ds-line{width:2px;flex:1;min-height:10px;margin:2px 0;background:var(--gray-100);}
+.ds-line.done{background:var(--green);}
+.ds-content{flex:1;padding-bottom:18px;}
+.ds-label{font-size:10px;font-weight:700;letter-spacing:.9px;text-transform:uppercase;margin-bottom:6px;}
+.ds-label.done{color:var(--green);}
+.ds-label.active{color:var(--accent);}
+.ds-label.pending{color:var(--gray-400);}
+.ds-box{border:var(--border);border-radius:8px;padding:10px 13px;background:var(--white);}
+.ds-box.empty{background:var(--gray-50);border-style:dashed;border-color:var(--gray-200);}
+.ds-box.empty p{font-size:12px;color:var(--gray-400);margin-bottom:7px;}
+.ds-row{display:flex;justify-content:space-between;align-items:center;font-size:12px;color:var(--gray-600);padding:3px 0;border-bottom:1px solid var(--gray-50);}
+.ds-row:last-child{border-bottom:none;}
+.ds-lbl{font-weight:500;}
+.ds-val{font-family:'DM Mono',monospace;font-size:11.5px;color:var(--gray-800);}
+.ds-actions{display:flex;gap:6px;margin-top:9px;flex-wrap:wrap;}
+
+/* csb-* kept as aliases so existing markup still works */
+.csb-row{display:flex;justify-content:space-between;font-size:12px;color:var(--gray-600);margin-bottom:4px;align-items:center;}
+.csb-row:last-child{margin-bottom:0;}
+.csb-label{font-weight:500;}
+.csb-val{font-family:'DM Mono',monospace;font-size:12px;color:var(--gray-800);}
+.csb-actions{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap;}
+
+/* EFCA page specific */
+.efca-card{border:var(--border);border-radius:10px;padding:18px 20px;background:var(--white);margin-bottom:12px;}
+.efca-card-head{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px;}
+.efca-card h3{font-size:14px;font-weight:600;color:var(--ink);}
+.efca-card .meta{font-size:12px;color:var(--gray-400);margin-top:2px;}
+.efca-meta-row{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:8px;}
+.efca-meta-item{font-size:12px;color:var(--gray-600);}
+.efca-meta-item span{font-weight:600;color:var(--ink);}
+
+/* MODAL */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.38);z-index:200;align-items:center;justify-content:center;}
+.modal-overlay.open{display:flex;}
+.modal{background:var(--white);border-radius:12px;width:640px;max-width:96vw;max-height:92vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,0.2);}
+.modal-lg{width:760px;}
+.modal-header{padding:18px 24px 14px;border-bottom:var(--border);display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;background:var(--white);z-index:1;}
+.modal-header h2{font-family:'DM Serif Display',serif;font-size:17px;}
+.modal-close{background:none;border:none;font-size:20px;cursor:pointer;color:var(--gray-400);padding:2px 6px;border-radius:4px;}
+.modal-close:hover{background:var(--gray-50);}
+.modal-body{padding:20px 24px;}
+.modal-footer{padding:14px 24px;border-top:var(--border);display:flex;gap:10px;justify-content:flex-end;position:sticky;bottom:0;background:var(--white);}
+
+/* FORM */
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.form-field{display:flex;flex-direction:column;gap:5px;}
+.form-field.span-2{grid-column:span 2;}
+label{font-size:12px;font-weight:600;color:var(--gray-600);}
+input,select,textarea{padding:8px 12px;border:var(--border);border-radius:7px;font-family:'DM Sans',sans-serif;font-size:13.5px;color:var(--ink);background:var(--white);outline:none;transition:border-color .15s;}
+input:focus,select:focus,textarea:focus{border-color:var(--accent-mid);}
+textarea{resize:vertical;min-height:68px;}
+.form-section-label{grid-column:span 2;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gray-400);padding-top:8px;border-top:var(--border);margin-top:4px;}
+.form-hint{font-size:11px;color:var(--gray-400);}
+
+/* LINKED RECORD PANEL inside modal */
+.linked-panel{grid-column:span 2;border:var(--border);border-radius:9px;padding:14px 16px;background:var(--gray-50);}
+.linked-panel-title{font-size:11px;font-weight:700;letter-spacing:.9px;text-transform:uppercase;color:var(--gray-400);margin-bottom:10px;}
+.linked-row{display:flex;justify-content:space-between;font-size:12px;color:var(--gray-600);padding:3px 0;}
+.linked-row .lv{font-family:'DM Mono',monospace;font-size:12px;color:var(--gray-800);}
+
+/* INLINE INVOICE BUILDER inside PO modal */
+.inv-builder-row{display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:8px;align-items:end;padding:10px 12px;border:var(--border);border-radius:7px;background:var(--white);margin-bottom:8px;}
+.ibr-field{display:flex;flex-direction:column;gap:4px;}
+.ibr-field label{font-size:11px;font-weight:600;color:var(--gray-500);}
+
+/* STAGE BOX */
+.status-stage-box{grid-column:span 2;border:var(--border);border-radius:9px;padding:14px 16px;background:var(--gray-50);}
+.stage-row{display:flex;align-items:center;gap:8px;margin-bottom:10px;}
+.stage-row:last-child{margin-bottom:0;}
+.stage-indicator{width:20px;height:20px;border-radius:50%;border:2px solid var(--gray-200);display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0;color:var(--gray-400);background:var(--white);}
+.stage-indicator.done{background:var(--green-light);border-color:var(--green);color:var(--green);}
+.stage-label{font-size:13px;font-weight:500;color:var(--gray-600);flex:1;}
+.stage-label.done{color:var(--green);}
+.stage-ref{font-family:'DM Mono',monospace;font-size:12px;background:var(--white);border:var(--border);border-radius:5px;padding:4px 8px;width:175px;color:var(--gray-800);}
+.stage-connector{width:2px;height:10px;background:var(--gray-200);margin-left:9px;}
+.stage-connector.done{background:var(--green);}
+
+/* FILTERS */
+.filters{display:flex;gap:10px;align-items:center;margin-bottom:16px;flex-wrap:wrap;}
+.filter-select{padding:6px 12px;border:var(--border);border-radius:7px;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--gray-800);background:var(--white);cursor:pointer;outline:none;}
+.search-input{padding:6px 12px 6px 32px;border:var(--border);border-radius:7px;font-family:'DM Sans',sans-serif;font-size:13px;outline:none;width:200px;background:var(--white) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' fill='none' viewBox='0 0 24 24' stroke='%239a9a92' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='M21 21l-4.35-4.35'/%3E%3C/svg%3E") no-repeat 10px center;}
+.search-input:focus{border-color:var(--accent-mid);}
+
+/* GRANT CARDS */
+.grant-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:16px;}
+.grant-card{border:var(--border);border-radius:12px;padding:20px;cursor:pointer;transition:box-shadow .15s,border-color .15s;}
+.grant-card:hover{box-shadow:0 4px 20px rgba(0,0,0,.07);border-color:var(--gray-200);}
+.grant-card h3{font-family:'DM Serif Display',serif;font-size:15px;margin-bottom:2px;}
+.grant-card .pi{font-size:12px;color:var(--gray-400);}
+.grant-card .grant-id{font-family:'DM Mono',monospace;font-size:11px;color:var(--gray-400);margin-bottom:10px;}
+.grant-balance-row{display:flex;justify-content:space-between;font-size:12px;color:var(--gray-600);margin-bottom:5px;}
+.grant-balance-row .amt{font-family:'DM Mono',monospace;font-weight:500;}
+.grant-balance-row .amt.green{color:var(--green);}
+.grant-balance-row .amt.red{color:var(--red);}
+
+/* TABS */
+.tabs{display:flex;border-bottom:var(--border);margin-bottom:20px;}
+.tab{padding:9px 18px;font-size:13px;font-weight:500;color:var(--gray-400);cursor:pointer;border-bottom:2.5px solid transparent;margin-bottom:-1.5px;transition:all .15s;}
+.tab:hover{color:var(--ink);}
+.tab.active{color:var(--accent);border-bottom-color:var(--accent);}
+
+/* YEAR TABS */
+.year-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;}
+.year-tab{padding:5px 13px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;border:var(--border);background:var(--white);color:var(--gray-600);transition:all .15s;}
+.year-tab:hover{background:var(--gray-50);}
+.year-tab.active{background:var(--accent);color:#fff;border-color:var(--accent);}
+
+/* YEAR CARD GRID */
+.year-budget-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:12px;margin-bottom:20px;}
+.year-card{border:var(--border);border-radius:10px;padding:14px 16px;}
+.year-card .yc-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
+.year-card .yc-year{font-family:'DM Serif Display',serif;font-size:14px;}
+.year-card .yc-row{display:flex;justify-content:space-between;font-size:12px;color:var(--gray-600);margin-bottom:4px;}
+.year-card .yc-val{font-family:'DM Mono',monospace;font-size:12px;}
+.year-card .yc-avail{font-size:13px;font-weight:600;margin-top:6px;padding-top:6px;border-top:var(--border);display:flex;justify-content:space-between;}
+
+/* DASH */
+.dash-grant-block{border:var(--border);border-radius:12px;margin-bottom:18px;overflow:hidden;}
+.dash-grant-header{display:flex;align-items:center;justify-content:space-between;padding:13px 18px;background:var(--gray-50);border-bottom:var(--border);cursor:pointer;user-select:none;}
+.dash-grant-header:hover{background:var(--gray-100);}
+.dash-grant-body{padding:14px 18px;}
+.dash-metrics-row{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:12px;}
+.dash-metric{background:var(--white);border:var(--border);border-radius:8px;padding:10px 12px;}
+.dash-metric .lbl{font-size:10px;font-weight:600;letter-spacing:.7px;text-transform:uppercase;color:var(--gray-400);margin-bottom:4px;}
+.dash-metric .val{font-family:'DM Mono',monospace;font-size:15px;font-weight:500;}
+.dash-metric.green .val{color:var(--green);}
+.dash-metric.amber .val{color:var(--amber);}
+.dash-metric.red .val{color:var(--red);}
+.dash-metric.blue .val{color:var(--accent);}
+.dash-metric .sub{font-size:10px;color:var(--gray-400);margin-top:2px;}
+
+/* ATTACHMENTS */
+.attach-zone{grid-column:span 2;border:2px dashed var(--gray-200);border-radius:8px;padding:16px;text-align:center;cursor:pointer;transition:border-color .15s;background:var(--gray-50);}
+.attach-zone:hover,.attach-zone.drag{border-color:var(--accent-mid);background:var(--accent-light);}
+.attach-zone .az-icon{font-size:22px;margin-bottom:5px;}
+.attach-zone .az-label{font-size:13px;color:var(--gray-600);}
+.attach-zone .az-hint{font-size:11px;color:var(--gray-400);margin-top:2px;}
+.attach-list{grid-column:span 2;display:flex;flex-direction:column;gap:5px;}
+.attach-item{display:flex;align-items:center;gap:9px;padding:7px 11px;border:var(--border);border-radius:7px;background:var(--white);}
+.attach-item .ai-icon{font-size:16px;flex-shrink:0;}
+.attach-item .ai-name{font-size:13px;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.attach-item .ai-size{font-size:11px;color:var(--gray-400);flex-shrink:0;}
+.attach-item .ai-del{background:none;border:none;cursor:pointer;color:var(--gray-400);font-size:13px;padding:2px 5px;border-radius:4px;}
+.attach-item .ai-del:hover{background:var(--red-light);color:var(--red);}
+.attach-item .ai-dl{background:none;border:none;cursor:pointer;color:var(--accent);font-size:12px;padding:2px 6px;border-radius:4px;font-family:'DM Sans',sans-serif;font-weight:500;}
+.attach-item .ai-dl:hover{background:var(--accent-light);}
+.attach-count{display:inline-flex;align-items:center;gap:3px;font-size:11px;color:var(--gray-400);}
+
+/* PARTIAL PAYMENTS */
+.payments-section{grid-column:span 2;}
+.payments-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
+.payments-header span{font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gray-400);}
+.payment-row{display:grid;grid-template-columns:1fr 1fr 1fr 1fr auto;gap:8px;align-items:end;margin-bottom:7px;padding:9px 11px;border:var(--border);border-radius:7px;background:var(--gray-50);}
+.payment-row .pr-field{display:flex;flex-direction:column;gap:3px;}
+.payment-row .pr-field label{font-size:11px;font-weight:600;color:var(--gray-500);}
+.payment-row .pr-del{background:none;border:none;cursor:pointer;color:var(--gray-400);font-size:15px;padding:4px 6px;border-radius:4px;align-self:flex-end;}
+.payment-row .pr-del:hover{background:var(--red-light);color:var(--red);}
+.inv-summary-bar{display:flex;border:var(--border);border-radius:8px;overflow:hidden;margin-bottom:12px;}
+.inv-summary-seg{flex:1;padding:9px 12px;text-align:center;border-right:var(--border);}
+.inv-summary-seg:last-child{border-right:none;}
+.inv-summary-seg .is-lbl{font-size:10px;font-weight:600;letter-spacing:.6px;text-transform:uppercase;color:var(--gray-400);margin-bottom:3px;}
+.inv-summary-seg .is-val{font-family:'DM Mono',monospace;font-size:14px;font-weight:500;}
+
+/* INVOICE EXPAND */
+.inv-expand{background:var(--gray-50);border-top:var(--border);}
+.inv-expand td{padding:10px 13px 10px 32px!important;font-size:12px;}
+
+/* EMPTY */
+.empty-state{text-align:center;padding:40px 20px;color:var(--gray-400);}
+.empty-state .icon{font-size:32px;margin-bottom:10px;}
+.empty-state p{font-size:14px;}
+.chip-row{display:flex;gap:5px;flex-wrap:wrap;}
+
+.action-btn{background:none;border:none;cursor:pointer;color:var(--gray-400);font-size:12px;padding:3px 6px;border-radius:4px;transition:all .12s;}
+.action-btn:hover{background:var(--gray-100);color:var(--ink);}
+.action-btn.del:hover{background:var(--red-light);color:var(--red);}
+.action-btn.edit:hover{background:var(--accent-light);color:var(--accent);}
+.action-btn.link:hover{background:var(--green-light);color:var(--green);}
+
+/* DETAIL page */
+.detail-back{display:flex;align-items:center;gap:6px;color:var(--gray-400);font-size:13px;cursor:pointer;margin-bottom:18px;width:fit-content;}
+.detail-back:hover{color:var(--ink);}
+.detail-heading{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:22px;gap:16px;}
+.detail-heading h2{font-family:'DM Serif Display',serif;font-size:22px;}
+.detail-heading .meta{font-size:13px;color:var(--gray-400);margin-top:3px;}
+.balance-block{border:var(--border);border-radius:12px;padding:18px 22px;margin-bottom:22px;background:var(--off-white);}
+.balance-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;font-size:13px;border-bottom:1px solid var(--gray-100);}
+.balance-row:last-child{border-bottom:none;}
+.balance-row.total{font-weight:600;font-size:14px;padding-top:10px;margin-top:3px;}
+.balance-row .lbl{color:var(--gray-600);}
+.balance-row .amt{font-family:'DM Mono',monospace;font-size:12px;}
+
+#toast{position:fixed;bottom:26px;right:26px;background:var(--ink);color:#fff;padding:12px 18px;border-radius:8px;font-size:13px;z-index:999;opacity:0;transform:translateY(8px);transition:all .25s;pointer-events:none;max-width:340px;display:flex;flex-direction:column;gap:5px;line-height:1.4;}
+#toast.show{opacity:1;transform:translateY(0);}
+/* ═══ AUTH SCREENS ═══ */
+.auth-screen{position:fixed;inset:0;background:var(--off-white);display:flex;align-items:center;justify-content:center;z-index:500;}
+.auth-card{background:var(--white);border:var(--border);border-radius:16px;padding:40px 44px;width:420px;max-width:95vw;box-shadow:0 8px 40px rgba(0,0,0,0.09);}
+.auth-logo{font-family:'DM Serif Display',serif;font-size:24px;color:var(--ink);margin-bottom:4px;}
+.auth-sub{font-size:12px;color:var(--gray-400);letter-spacing:.4px;text-transform:uppercase;margin-bottom:28px;}
+.auth-tabs{display:flex;border-bottom:var(--border);margin-bottom:22px;}
+.auth-tab{padding:8px 18px;font-size:13px;font-weight:500;color:var(--gray-400);cursor:pointer;border-bottom:2.5px solid transparent;margin-bottom:-1.5px;transition:all .15s;}
+.auth-tab.active{color:var(--accent);border-bottom-color:var(--accent);}
+.auth-form .form-field{margin-bottom:14px;display:flex;flex-direction:column;gap:5px;}
+.auth-form label{font-size:12px;font-weight:600;color:var(--gray-600);}
+.auth-form input,.auth-form select{padding:9px 13px;border:var(--border);border-radius:8px;font-size:14px;font-family:'DM Sans',sans-serif;outline:none;transition:border-color .15s;width:100%;}
+.auth-form input:focus,.auth-form select:focus{border-color:var(--accent-mid);}
+.auth-btn{width:100%;padding:11px;border-radius:8px;font-size:14px;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;border:none;margin-top:4px;transition:all .15s;}
+.auth-btn-primary{background:var(--accent);color:#fff;}
+.auth-btn-primary:hover{background:var(--accent-mid);}
+.auth-error{background:var(--red-light);color:var(--red);font-size:12px;padding:8px 12px;border-radius:7px;margin-bottom:12px;display:none;}
+.auth-error.show{display:block;}
+.auth-success{background:var(--green-light);color:var(--green);font-size:12px;padding:8px 12px;border-radius:7px;margin-bottom:12px;display:none;}
+.auth-success.show{display:block;}
+.auth-hint{font-size:11px;color:var(--gray-400);margin-top:14px;text-align:center;line-height:1.5;}
+.auth-hint strong{color:var(--ink);}
+
+/* ═══ ACCESS-PENDING SCREEN ═══ */
+.pending-screen{position:fixed;inset:0;background:var(--off-white);display:none;align-items:center;justify-content:center;z-index:490;}
+.pending-screen.show{display:flex;}
+.pending-card{background:var(--white);border:var(--border);border-radius:16px;padding:40px;width:460px;max-width:95vw;text-align:center;box-shadow:0 8px 40px rgba(0,0,0,0.08);}
+.pending-icon{font-size:42px;margin-bottom:14px;}
+.pending-card h2{font-family:'DM Serif Display',serif;font-size:20px;margin-bottom:8px;}
+.pending-card p{font-size:13px;color:var(--gray-600);line-height:1.6;margin-bottom:16px;}
+
+/* ═══ AUTH LOADING OVERLAY ═══ */
+.auth-loading{position:fixed;inset:0;background:var(--off-white);display:flex;align-items:center;justify-content:center;z-index:600;flex-direction:column;gap:14px;}
+.auth-loading-spinner{width:36px;height:36px;border:3px solid var(--gray-200);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg)}}
+.auth-loading-text{font-size:13px;color:var(--gray-400);}
+
+/* ═══ ACCESS REQUEST BADGE ═══ */
+.req-badge{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:600;}
+.req-pending{background:var(--amber-light);color:var(--amber);}
+.req-approved{background:var(--green-light);color:var(--green);}
+.req-rejected{background:var(--red-light);color:var(--red);}
+
+/* ═══ ADMIN NOTIFICATION DOT ═══ */
+.notif-dot{display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;background:#e05;color:#fff;border-radius:50%;font-size:9px;font-weight:700;margin-left:auto;}
+
+
+@media(max-width:1100px){.dash-metrics-row,.totals-row{grid-template-columns:repeat(3,1fr);}}
+@media(max-width:900px){.sidebar{width:220px;min-width:220px;}.main{margin-left:220px;}.form-grid{grid-template-columns:1fr;}.form-field.span-2,.form-section-label,.status-stage-box,.attach-zone,.attach-list,.payments-section,.linked-panel{grid-column:span 1;}}
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sidebar-logo"><h1>GrantTrack</h1><span>University Financial System</span></div>
+  <div class="sidebar-section">
+    <div class="sidebar-section-label">Overview</div>
+    <div class="nav-item" onclick="navigate('dashboard')"><span class="icon">◈</span> Dashboard</div>
+    <div class="nav-item" onclick="navigate('grants')"><span class="icon">◉</span> Grants</div>
+  </div>
+  <div class="sidebar-section">
+    <div class="sidebar-section-label">Transactions</div>
+    <div class="nav-item" onclick="navigate('procurement')"><span class="icon">◈</span> Orders &amp; Approvals</div>
+    <div class="nav-sub">
+      <div class="nav-item" onclick="navigate('efca')"><span class="icon">✓</span> EFCA Approvals</div>
+      <div class="nav-item" onclick="navigate('requisitions')"><span class="icon">◧</span> Requisitions</div>
+      <div class="nav-item" onclick="navigate('po')"><span class="icon">◪</span> Purchase Orders</div>
+      <div class="nav-item" onclick="navigate('invoices')"><span class="icon">◨</span> Invoices</div>
+    </div>
+  </div>
+  <div class="sidebar-section">
+    <div class="sidebar-section-label">Admin</div>
+    <div class="nav-item" onclick="navigate('pis')"><span class="icon">◎</span> Principal Investigators</div>
+    <div class="nav-item" onclick="navigate('users')" id="nav-users"><span class="icon">◉</span> Users &amp; Access<span class="notif-dot" id="req-notif" style="display:none">0</span></div>
+  </div>
+  <div class="sidebar-user">
+    <div class="user-avatar">AD</div>
+    <div class="user-info"><div class="name">Admin User</div><div class="role">Grant Administrator</div></div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<main class="main">
+  <div class="topbar">
+    <div class="topbar-title" id="topbarTitle">Dashboard</div>
+    <div class="topbar-actions" id="topbarActions"></div>
+  </div>
+
+  <!-- DASHBOARD -->
+  <div class="page active" id="page-dashboard">
+    <div class="section-header" style="margin-bottom:14px"><span class="section-title">Portfolio Summary</span></div>
+    <div class="totals-row" id="dashTotals"></div>
+    <div class="section-header">
+      <span class="section-title">By Grant</span>
+      <select class="filter-select" id="dashPIFilter" onchange="renderDashboard()"><option value="">All PIs</option></select>
+    </div>
+    <div id="dashGrantBlocks"></div>
+  </div>
+
+  <!-- GRANTS -->
+  <div class="page" id="page-grants">
+    <div class="filters">
+      <input class="search-input" placeholder="Search grants…" oninput="renderGrants(this.value)" id="grantSearch">
+      <select class="filter-select" onchange="renderGrants()" id="grantPIFilter"><option value="">All PIs</option></select>
+      <select class="filter-select" onchange="renderGrants()" id="grantStatusFilter"><option value="">All Status</option><option>Active</option><option>Closed</option><option>Pending</option></select>
+    </div>
+    <div class="grant-grid" id="grantGrid"></div>
+  </div>
+
+  <!-- GRANT DETAIL -->
+  <div class="page" id="page-grant-detail">
+    <div class="detail-back" onclick="navigate('grants')">← Back to Grants</div>
+    <div class="detail-heading" id="grantDetailHeading"></div>
+    <div id="grantDetailYearSection"></div>
+    <div class="tabs" id="grantDetailTabs">
+      <div class="tab active" onclick="grantTab('overview',this)">Overview</div>
+      <div class="tab" onclick="grantTab('procurement',this)">Procurement Chain</div>
+      <div class="tab" onclick="grantTab('reqs',this)">Requisitions</div>
+      <div class="tab" onclick="grantTab('pos',this)">Purchase Orders</div>
+      <div class="tab" onclick="grantTab('invs',this)">Invoices</div>
+      <div class="tab" onclick="grantTab('users',this)">Users</div>
+    </div>
+    <div id="grantDetailTab"></div>
+  </div>
+
+  <!-- ORDERS & APPROVALS — unified page with sub-tabs -->
+  <div class="page" id="page-procurement">
+    <!-- Sub-tab bar -->
+    <div class="tabs" id="procSubTabs" style="margin-bottom:20px">
+      <div class="tab active" onclick="procSubTab('chain',this)">Procurement Chain</div>
+      <div class="tab" onclick="procSubTab('efca',this)">EFCA Approvals</div>
+      <div class="tab" onclick="procSubTab('reqs',this)">Requisitions</div>
+      <div class="tab" onclick="procSubTab('pos',this)">Purchase Orders</div>
+      <div class="tab" onclick="procSubTab('invs',this)">Invoices</div>
+    </div>
+
+    <!-- CHAIN sub-tab -->
+    <div id="proc-subtab-chain">
+      <div class="filters">
+        <input class="search-input" placeholder="Search by description, vendor…" oninput="renderProcurement(this.value)" id="procSearch">
+        <select class="filter-select" onchange="renderProcurement()" id="procGrantFilter"><option value="">All Grants</option></select>
+        <select class="filter-select" onchange="renderProcurement()" id="procStatusFilter">
+          <option value="">All Status</option>
+          <option>EFCA Approved</option><option>Requisition Submitted</option>
+          <option>PO Generated</option><option>Invoice Received</option><option>Paid</option>
+        </select>
+      </div>
+      <div id="procList"></div>
+    </div>
+
+    <!-- EFCA sub-tab -->
+    <div id="proc-subtab-efca" style="display:none">
+      <div class="filters">
+        <input class="search-input" placeholder="Search EFCA approvals…" oninput="renderEFCA(this.value)">
+        <select class="filter-select" onchange="renderEFCA()" id="efcaGrantFilter"><option value="">All Grants</option></select>
+        <select class="filter-select" onchange="renderEFCA()" id="efcaStatusFilter">
+          <option value="">All Status</option><option>Pending EFCA</option><option>EFCA Approved</option><option>Rejected</option>
+        </select>
+      </div>
+      <div id="efcaList"></div>
+    </div>
+
+    <!-- REQS sub-tab -->
+    <div id="proc-subtab-reqs" style="display:none">
+      <div class="filters">
+        <input class="search-input" placeholder="Search requisitions…" oninput="renderReqsInline(this.value)">
+        <select class="filter-select" onchange="renderReqsInline()" id="procReqGrantFilter"><option value="">All Grants</option></select>
+        <select class="filter-select" onchange="renderReqsInline()" id="procReqStatusFilter"><option value="">All Status</option><option>Draft</option><option>Submitted</option><option>Approved</option><option>Rejected</option></select>
+      </div>
+      <div class="table-wrap" id="procReqsTable"></div>
+    </div>
+
+    <!-- POs sub-tab -->
+    <div id="proc-subtab-pos" style="display:none">
+      <div class="filters">
+        <input class="search-input" placeholder="Search POs…" oninput="renderPOsInline(this.value)">
+        <select class="filter-select" onchange="renderPOsInline()" id="procPoGrantFilter"><option value="">All Grants</option></select>
+        <select class="filter-select" onchange="renderPOsInline()" id="procPoStatusFilter"><option value="">All Status</option><option>Open</option><option>Partially Received</option><option>Closed</option></select>
+      </div>
+      <div class="table-wrap" id="procPosTable"></div>
+    </div>
+
+    <!-- INVOICES sub-tab -->
+    <div id="proc-subtab-invs" style="display:none">
+      <div class="filters">
+        <input class="search-input" placeholder="Search invoices…" oninput="renderInvoicesInline(this.value)">
+        <select class="filter-select" onchange="renderInvoicesInline()" id="procInvGrantFilter"><option value="">All Grants</option></select>
+        <select class="filter-select" onchange="renderInvoicesInline()" id="procInvStatusFilter"><option value="">All Status</option><option>Pending</option><option>Partially Paid</option><option>Paid</option><option>Disputed</option></select>
+      </div>
+      <div class="table-wrap" id="procInvsTable"></div>
+    </div>
+  </div>
+
+  <!-- Standalone EFCA page (nav sub-item shortcut → redirects to procurement#efca) -->
+  <div class="page" id="page-efca" style="display:none!important"></div>
+
+  <!-- PIs -->
+  <div class="page" id="page-pis"><div class="table-wrap" id="pisTable"></div></div>
+
+  <!-- USERS -->
+  <div class="page" id="page-users">
+    <div class="filters">
+      <input class="search-input" placeholder="Search users…" oninput="renderUsers(this.value)">
+      <select class="filter-select" onchange="renderUsers()" id="userRoleFilter"><option value="">All Roles</option><option>Admin</option><option>PI</option><option>Researcher</option><option>Finance</option></select>
+    </div>
+    <div id="usersTable"></div>
+  </div>
+</main>
+</div>
+
+<!-- ═══════════════ MODALS ═══════════════ -->
+
+<!-- EFCA / ORDER MODAL -->
+<div class="modal-overlay" id="modal-order">
+  <div class="modal">
+    <div class="modal-header"><h2 id="orderModalTitle">New EFCA Request</h2><button class="modal-close" onclick="closeModal('modal-order')">×</button></div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="form-field"><label>Grant</label><select id="f-order-grant" onchange="syncYearSelect('f-order-grant','f-order-year')"></select></div>
+        <div class="form-field"><label>Grant Year</label><select id="f-order-year"><option value="">— Select Year —</option></select></div>
+        <div class="form-field"><label>Requestor</label><select id="f-order-user"></select></div>
+        <div class="form-field"><label>Date</label><input id="f-order-date" type="date"></div>
+        <div class="form-field span-2"><label>Description / Item</label><input id="f-order-desc" placeholder="What is being ordered?"></div>
+        <div class="form-field"><label>Vendor</label><input id="f-order-vendor"></div>
+        <div class="form-field"><label>Amount ($)</label><input id="f-order-amount" type="number" placeholder="0.00"></div>
+        <div class="form-field span-2"><label>Category</label><input id="f-order-category" placeholder="e.g. Supplies, Equipment, Services…"></div>
+        <div class="form-field span-2"><label>Justification</label><textarea id="f-order-just" style="min-height:52px"></textarea></div>
+        <div class="form-section-label">EFCA &amp; Workflow Status</div>
+        <div class="form-field"><label>EFCA Status</label><select id="f-order-efca"><option>Pending EFCA</option><option>EFCA Approved</option><option>Rejected</option></select></div>
+        <div class="form-field"><label>EFCA Approval #</label><input id="f-order-efca-ref" placeholder="EFCA reference #"></div>
+        <div class="form-section-label">Procurement Stage</div>
+        <div class="status-stage-box span-2">
+          <div class="stage-row"><div class="stage-indicator" id="stageInd-0">1</div><span class="stage-label" id="stageLbl-0">EFCA Approved</span><label style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--gray-600);cursor:pointer;font-weight:400"><input type="checkbox" id="stage-check-0" onchange="refreshStageUI()" style="width:14px;height:14px;cursor:pointer"> Complete</label></div>
+          <div class="stage-connector" id="stageCon-0"></div>
+          <div class="stage-row"><div class="stage-indicator" id="stageInd-1">2</div><span class="stage-label" id="stageLbl-1">Requisition Submitted</span><input class="stage-ref" id="stage-ref-1" placeholder="Req #" type="text" oninput="refreshStageUI()"></div>
+          <div class="stage-connector" id="stageCon-1"></div>
+          <div class="stage-row"><div class="stage-indicator" id="stageInd-2">3</div><span class="stage-label" id="stageLbl-2">PO Generated</span><input class="stage-ref" id="stage-ref-2" placeholder="PO #" type="text" oninput="refreshStageUI()"></div>
+          <div class="stage-connector" id="stageCon-2"></div>
+          <div class="stage-row"><div class="stage-indicator" id="stageInd-3">4</div><span class="stage-label" id="stageLbl-3">Invoice Received</span><input class="stage-ref" id="stage-ref-3" placeholder="Invoice #" type="text" oninput="refreshStageUI()"></div>
+          <div class="stage-connector" id="stageCon-3"></div>
+          <div class="stage-row"><div class="stage-indicator" id="stageInd-4">5</div><span class="stage-label" id="stageLbl-4">Paid</span><label style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--gray-600);cursor:pointer;font-weight:400"><input type="checkbox" id="stage-check-4" onchange="refreshStageUI()" style="width:14px;height:14px;cursor:pointer"> Mark paid</label></div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('modal-order')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveOrder()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- REQUISITION MODAL — with PO entry section -->
+<div class="modal-overlay" id="modal-req">
+  <div class="modal modal-lg">
+    <div class="modal-header"><h2 id="reqModalTitle">New Requisition</h2><button class="modal-close" onclick="closeModal('modal-req')">×</button></div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="form-field"><label>Grant</label><select id="f-req-grant" onchange="syncYearSelect('f-req-grant','f-req-year')"></select></div>
+        <div class="form-field"><label>Grant Year</label><select id="f-req-year"><option value="">— Select Year —</option></select></div>
+        <div class="form-field"><label>Requestor</label><select id="f-req-user"></select></div>
+        <div class="form-field"><label>Date</label><input id="f-req-date" type="date"></div>
+        <div class="form-field"><label>Requisition Number <span style="color:var(--accent-mid);font-size:11px;font-weight:400">(Official)</span></label><input id="f-req-number-input" placeholder="e.g. REQ-2024-0042" autocomplete="off" style="font-family:'DM Mono',monospace;font-size:13px"></div>
+        <div class="form-field"><label>Status</label><select id="f-req-status"><option>Draft</option><option>Submitted</option><option>Approved</option><option>Rejected</option></select></div>
+        <div class="form-field span-2"><label>Description</label><input id="f-req-desc"></div>
+        <div class="form-field"><label>Vendor</label><input id="f-req-vendor"></div>
+        <div class="form-field"><label>Amount ($)</label><input id="f-req-amount" type="number" placeholder="0.00"></div>
+        <div class="form-field"><label>Linked EFCA Ref #</label><input id="f-req-efca-ref" placeholder="Optional"></div>
+        <div class="form-field span-2"><label>Notes</label><textarea id="f-req-notes" style="min-height:52px"></textarea></div>
+
+        <!-- PO ENTRY SECTION inside Req modal -->
+        <div class="form-section-label" id="req-po-section-label">Purchase Order Received</div>
+        <div class="form-hint span-2" style="margin-top:-6px" id="req-po-hint">Once a PO is issued for this requisition, enter the details here. The PO record will be automatically created and linked.</div>
+        <div class="form-field"><label>PO Number</label><input id="f-req-po-number" placeholder="e.g. PO-2024-0042"></div>
+        <div class="form-field"><label>PO Issue Date</label><input id="f-req-po-date" type="date"></div>
+        <div class="form-field"><label>PO Amount ($)</label><input id="f-req-po-amount" type="number" placeholder="0.00"></div>
+        <div class="form-field"><label>PO Status</label><select id="f-req-po-status"><option value="">— Not yet received —</option><option>Open</option><option>Partially Received</option><option>Closed</option></select></div>
+
+        <!-- Attachments -->
+        <div class="form-section-label">Attachments</div>
+        <div class="attach-zone span-2" id="req-drop-zone" ondragover="dzDragOver(event,'req-drop-zone')" ondragleave="dzDragLeave('req-drop-zone')" ondrop="dzDrop(event,'req')" onclick="document.getElementById('req-file-input').click()">
+          <div class="az-icon">📎</div><div class="az-label">Click or drag files to attach</div>
+          <div class="az-hint">PDF, Word, Excel, images — up to 20 MB each</div>
+        </div>
+        <input type="file" id="req-file-input" multiple style="display:none" onchange="handleFileInput(event,'req')">
+        <div class="attach-list" id="req-attach-list"></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('modal-req')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveReq()">Save Requisition</button>
+    </div>
+  </div>
+</div>
+
+<!-- PO MODAL — with Invoice entry section -->
+<div class="modal-overlay" id="modal-po">
+  <div class="modal modal-lg">
+    <div class="modal-header"><h2 id="poModalTitle">New Purchase Order</h2><button class="modal-close" onclick="closeModal('modal-po')">×</button></div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="form-field"><label>Grant</label><select id="f-po-grant" onchange="syncYearSelect('f-po-grant','f-po-year')"></select></div>
+        <div class="form-field"><label>Grant Year</label><select id="f-po-year"><option value="">— Select Year —</option></select></div>
+        <div class="form-field"><label>PO Number</label><input id="f-po-number" placeholder="e.g. PO-2024-0042"></div>
+        <div class="form-field"><label>Issue Date</label><input id="f-po-date" type="date"></div>
+        <div class="form-field span-2"><label>Description</label><input id="f-po-desc"></div>
+        <div class="form-field"><label>Vendor</label><input id="f-po-vendor"></div>
+        <div class="form-field"><label>PO Amount ($)</label><input id="f-po-amount" type="number" placeholder="0.00"></div>
+        <div class="form-field"><label>Encumbered ($)</label><input id="f-po-enc" type="number" placeholder="0.00"></div>
+        <div class="form-field"><label>Status</label><select id="f-po-status"><option>Open</option><option>Partially Received</option><option>Closed</option></select></div>
+        <div class="form-field"><label>Linked Req #</label><input id="f-po-req" placeholder="Optional — links to REQ"></div>
+
+        <!-- INVOICE ENTRY inside PO modal -->
+        <div class="form-section-label">Invoices Received Against This PO</div>
+        <div class="form-hint span-2" style="margin-top:-6px">Add each invoice received for this PO. Invoice records will be automatically created and linked to this PO.</div>
+        <div class="span-2" id="po-inv-builder" style="display:flex;flex-direction:column;gap:8px;"></div>
+        <div class="span-2"><button type="button" class="btn btn-secondary btn-sm" onclick="addPOInvoiceRow()">+ Add Invoice</button></div>
+
+        <!-- Attachments -->
+        <div class="form-section-label">Attachments</div>
+        <div class="attach-zone span-2" id="po-drop-zone" ondragover="dzDragOver(event,'po-drop-zone')" ondragleave="dzDragLeave('po-drop-zone')" ondrop="dzDrop(event,'po')" onclick="document.getElementById('po-file-input').click()">
+          <div class="az-icon">📎</div><div class="az-label">Click or drag files to attach</div>
+          <div class="az-hint">PDF, Word, Excel, images — up to 20 MB each</div>
+        </div>
+        <input type="file" id="po-file-input" multiple style="display:none" onchange="handleFileInput(event,'po')">
+        <div class="attach-list" id="po-attach-list"></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('modal-po')">Cancel</button>
+      <button class="btn btn-primary" onclick="savePO()">Save PO</button>
+    </div>
+  </div>
+</div>
+
+<!-- INVOICE MODAL -->
+<div class="modal-overlay" id="modal-invoice">
+  <div class="modal modal-lg">
+    <div class="modal-header"><h2 id="invModalTitle">New Invoice</h2><button class="modal-close" onclick="closeModal('modal-invoice')">×</button></div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="form-field"><label>Grant</label><select id="f-inv-grant" onchange="syncYearSelect('f-inv-grant','f-inv-year')"></select></div>
+        <div class="form-field"><label>Grant Year</label><select id="f-inv-year"><option value="">— Select Year —</option></select></div>
+        <div class="form-field"><label>Invoice #</label><input id="f-inv-num" placeholder="e.g. INV-2024-0099"></div>
+        <div class="form-field"><label>Vendor</label><input id="f-inv-vendor"></div>
+        <div class="form-field"><label>Linked PO #</label><input id="f-inv-po" placeholder="Optional — links to PO"></div>
+        <div class="form-field"><label>Invoice Date</label><input id="f-inv-date" type="date"></div>
+        <div class="form-field"><label>Due Date</label><input id="f-inv-due" type="date"></div>
+        <div class="form-field"><label>Status</label><select id="f-inv-status"><option>Pending</option><option>Partially Paid</option><option>Paid</option><option>Disputed</option></select></div>
+        <div class="form-field span-2"><label>Description</label><input id="f-inv-desc"></div>
+        <div class="form-field span-2"><label>Total Invoice Amount ($)</label><input id="f-inv-amount" type="number" placeholder="0.00" oninput="updateInvSummary()"></div>
+        <div class="form-section-label">Payments</div>
+        <div class="inv-summary-bar" id="inv-summary-bar" style="grid-column:span 2">
+          <div class="inv-summary-seg"><div class="is-lbl">Invoice Total</div><div class="is-val" id="is-total">$0.00</div></div>
+          <div class="inv-summary-seg"><div class="is-lbl">Total Paid</div><div class="is-val" id="is-paid" style="color:var(--green)">$0.00</div></div>
+          <div class="inv-summary-seg"><div class="is-lbl">Remaining</div><div class="is-val" id="is-remaining" style="color:var(--amber)">$0.00</div></div>
+        </div>
+        <div class="payments-section">
+          <div class="payments-header"><span>Payment Installments</span><button type="button" class="btn btn-secondary btn-sm" onclick="addPaymentRow()">+ Add Payment</button></div>
+          <div id="paymentRows"></div>
+        </div>
+        <div class="form-section-label">Attachments</div>
+        <div class="attach-zone span-2" id="inv-drop-zone" ondragover="dzDragOver(event,'inv-drop-zone')" ondragleave="dzDragLeave('inv-drop-zone')" ondrop="dzDrop(event,'inv')" onclick="document.getElementById('inv-file-input').click()">
+          <div class="az-icon">📎</div><div class="az-label">Click or drag files to attach</div>
+          <div class="az-hint">PDF, Word, Excel, images — up to 20 MB each</div>
+        </div>
+        <input type="file" id="inv-file-input" multiple style="display:none" onchange="handleFileInput(event,'inv')">
+        <div class="attach-list" id="inv-attach-list"></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('modal-invoice')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveInvoice()">Save Invoice</button>
+    </div>
+  </div>
+</div>
+
+<!-- GRANT MODAL -->
+<div class="modal-overlay" id="modal-grant">
+  <div class="modal modal-lg">
+    <div class="modal-header"><h2 id="grantModalTitle">New Grant</h2><button class="modal-close" onclick="closeModal('modal-grant')">×</button></div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="form-field span-2"><label>Grant Title</label><input id="f-grant-title" placeholder="e.g. NIH R01 Cancer Research 2024"></div>
+        <div class="form-field"><label>Grant ID / Award #</label><input id="f-grant-id" placeholder="e.g. R01CA123456"></div>
+        <div class="form-field"><label>Sponsor / Agency</label><input id="f-grant-sponsor"></div>
+        <div class="form-field"><label>Principal Investigator</label><select id="f-grant-pi"></select></div>
+        <div class="form-field"><label>Status</label><select id="f-grant-status"><option>Active</option><option>Pending</option><option>Closed</option></select></div>
+        <div class="form-field"><label>Start Date</label><input id="f-grant-start" type="date" onchange="buildYearRows()"></div>
+        <div class="form-field"><label>End Date</label><input id="f-grant-end" type="date" onchange="buildYearRows()"></div>
+        <div class="form-field span-2"><label>Notes</label><textarea id="f-grant-notes" style="min-height:52px"></textarea></div>
+        <div class="form-section-label">Annual Budgets</div>
+        <div class="form-hint span-2" style="margin-top:-8px">Budget per grant year. Enter start/end dates above to auto-generate rows.</div>
+        <div id="yearBudgetRows" class="span-2" style="display:flex;flex-direction:column;gap:8px;"></div>
+        <div class="form-field span-2" style="flex-direction:row;align-items:center;justify-content:space-between;margin-top:4px">
+          <span style="font-size:13px;color:var(--gray-600)">Total: <span id="yearBudgetTotal" style="font-family:'DM Mono',monospace;font-weight:600;color:var(--ink)">$0.00</span></span>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('modal-grant')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveGrant()">Save Grant</button>
+    </div>
+  </div>
+</div>
+
+<!-- PI MODAL -->
+<div class="modal-overlay" id="modal-pi">
+  <div class="modal">
+    <div class="modal-header"><h2 id="piModalTitle">Add PI</h2><button class="modal-close" onclick="closeModal('modal-pi')">×</button></div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="form-field"><label>First Name</label><input id="f-pi-first"></div>
+        <div class="form-field"><label>Last Name</label><input id="f-pi-last"></div>
+        <div class="form-field"><label>Email</label><input id="f-pi-email" type="email"></div>
+        <div class="form-field"><label>Department</label><input id="f-pi-dept"></div>
+        <div class="form-field span-2"><label>Title</label><input id="f-pi-title" placeholder="e.g. Associate Professor"></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('modal-pi')">Cancel</button>
+      <button class="btn btn-primary" onclick="savePI()">Save PI</button>
+    </div>
+  </div>
+</div>
+
+<!-- USER MODAL -->
+<div class="modal-overlay" id="modal-user">
+  <div class="modal">
+    <div class="modal-header"><h2 id="userModalTitle">Add User</h2><button class="modal-close" onclick="closeModal('modal-user')">×</button></div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="form-field"><label>First Name</label><input id="f-user-first"></div>
+        <div class="form-field"><label>Last Name</label><input id="f-user-last"></div>
+        <div class="form-field"><label>Email</label><input id="f-user-email" type="email"></div>
+        <div class="form-field"><label>Role</label><select id="f-user-role"><option>Researcher</option><option>Finance</option><option>PI</option><option>Admin</option></select></div>
+        <div class="form-field span-2"><label>Grant Access (Ctrl/Cmd multi-select)</label><select id="f-user-grants" multiple style="height:90px;"></select></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('modal-user')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveUser()">Save User</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script type="module">
+// ═══════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════
+let state = {
+  currentPage:'dashboard', currentGrantId:null, currentGrantTab:'overview',
+  currentGrantYear:null, currentProcSubTab:'chain', editingId:null,
+  pis:[], grants:[], orders:[], requisitions:[], pos:[], invoices:[], users:[],
+  nextId:300,
+  stagingAttachments:{req:[],po:[],inv:[]},
+  _editingGrantYears:[], _yearRowCount:0,
+};
+
+// Inline PO invoice rows being built
+let _poInvoiceRows = [];
+// Inline payment rows for invoice modal
+let _payments = [];
+
+function uid(){return ++state.nextId;}
+
+// ═══════════════════════════════════════════════════════
+// HELPERS
+// ═══════════════════════════════════════════════════════
+const fmt = n=>'$'+Number(n||0).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+const fmtDate = d=>{if(!d)return'—';const[y,m,dd]=d.split('-');return`${m}/${dd}/${y}`;};
+const piName = id=>{const p=state.pis.find(x=>x.id===id);return p?`${p.first} ${p.last}`:'—';};
+const grantById = id=>state.grants.find(g=>g.id===id)||{};
+const userName = id=>{const u=state.users.find(x=>x.id===id);return u?`${u.first} ${u.last}`:'—';};
+
+// Grant year helpers
+function grantYears(g){return(g.yearBudgets||[]).slice().sort((a,b)=>a.label.localeCompare(b.label));}
+function grantTotalBudget(g){const yb=grantYears(g);return yb.length?yb.reduce((s,y)=>s+Number(y.budget||0),0):Number(g.budget||0);}
+function grantYearBudget(g,yl){if(!yl||yl==='all')return grantTotalBudget(g);const y=(g.yearBudgets||[]).find(yb=>yb.label===yl);return y?Number(y.budget||0):0;}
+
+// Invoice payment helpers
+function invTotalPaid(inv){return(inv.payments||[]).filter(p=>p.status==='Paid').reduce((s,p)=>s+Number(p.amount||0),0);}
+function invRemaining(inv){return Number(inv.amount||0)-invTotalPaid(inv);}
+function invComputedStatus(inv){
+  const total=Number(inv.amount||0),paid=invTotalPaid(inv);
+  if(inv.status==='Disputed')return'Disputed';
+  if(paid<=0)return'Pending';
+  if(paid>=total)return'Paid';
+  return'Partially Paid';
+}
+
+// Financial aggregates (optionally by year)
+function grantSpent(gid,yl){
+  return state.invoices.filter(i=>i.grantId===gid&&(!yl||yl==='all'||i.grantYear===yl)).reduce((s,i)=>s+invTotalPaid(i),0);
+}
+function grantEncumbered(gid,yl){
+  return state.pos.filter(p=>p.grantId===gid&&p.status!=='Closed'&&(!yl||yl==='all'||p.grantYear===yl)).reduce((s,p)=>s+Number(p.enc||0),0);
+}
+function grantAvailable(gid,yl){return grantYearBudget(grantById(gid),yl)-grantSpent(gid,yl)-grantEncumbered(gid,yl);}
+
+// Order stage helpers
+function orderCurrentStage(o){
+  const s=o.stages||{};
+  if(s.paid)return'Paid';if(s.invoice)return'Invoice Received';
+  if(s.po)return'PO Generated';if(s.req)return'Requisition Submitted';
+  if(s.efca)return'EFCA Approved';return'Pending';
+}
+function orderStageIndex(o){
+  const s=o.stages||{};
+  if(s.paid)return 4;if(s.invoice)return 3;if(s.po)return 2;if(s.req)return 1;if(s.efca)return 0;return -1;
+}
+
+// Get linked PO for a requisition
+function getLinkedPO(req){return state.pos.find(p=>p.linkedReqId===req.id||p.req===req.reqNumber)||null;}
+// Get linked invoices for a PO
+function getLinkedInvoices(po){return state.invoices.filter(i=>i.linkedPoId===po.id||i.po===po.number);}
+
+const STAGE_BADGE={'EFCA Approved':'badge-blue','Requisition Submitted':'badge-teal','PO Generated':'badge-amber','Invoice Received':'badge-purple','Paid':'badge-green','Pending':'badge-gray'};
+const STATUS_BADGE={'Approved':'badge-green','Paid':'badge-green','Closed':'badge-gray','Active':'badge-green','Pending':'badge-amber','Submitted':'badge-blue','Draft':'badge-gray','Open':'badge-teal','Partially Received':'badge-amber','Partially Paid':'badge-amber','Rejected':'badge-red','Disputed':'badge-red','EFCA Approved':'badge-blue','Pending EFCA':'badge-amber'};
+function badge(s,cls){return`<span class="badge ${cls||STATUS_BADGE[s]||'badge-gray'}">${s}</span>`;}
+
+function pipelineHTML(o){
+  const idx=orderStageIndex(o);
+  let h='<div class="pipeline">';
+  for(let i=0;i<5;i++){h+=`<div class="pip-dot ${i<=idx?'done':''}"></div>`;if(i<4)h+=`<div class="pip-line ${i<idx?'done':''}"></div>`;}
+  return h+'</div>';
+}
+
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2600);}
+
+// File helpers
+function fileIcon(name){const ext=(name.split('.').pop()||'').toLowerCase();if(['pdf'].includes(ext))return'📄';if(['doc','docx'].includes(ext))return'📝';if(['xls','xlsx','csv'].includes(ext))return'📊';if(['jpg','jpeg','png','gif','webp'].includes(ext))return'🖼️';return'📎';}
+function fmtSize(b){return b<1024?b+'B':b<1048576?(b/1024).toFixed(1)+'KB':(b/1048576).toFixed(1)+'MB';}
+
+// ═══════════════════════════════════════════════════════
+// SEED DATA
+// ═══════════════════════════════════════════════════════
+function seedData(){
+  state.pis=[
+    {id:1,first:'Margaret',last:'Chen',email:'mchen@univ.edu',dept:'Biochemistry',title:'Professor'},
+    {id:2,first:'David',last:'Torres',email:'dtorres@univ.edu',dept:'Physics',title:'Associate Professor'},
+    {id:3,first:'Amara',last:'Okafor',email:'aokafor@univ.edu',dept:'Environmental Sciences',title:'Assistant Professor'},
+  ];
+  state.grants=[
+    {id:10,title:'NIH R01: Protein Folding Mechanisms',grantId:'R01GM987654',sponsor:'NIH',piId:1,status:'Active',start:'2023-07-01',end:'2026-06-30',notes:'',
+     yearBudgets:[{label:'Year 1 (FY2023-24)',start:'2023-07-01',end:'2024-06-30',budget:290000},{label:'Year 2 (FY2024-25)',start:'2024-07-01',end:'2025-06-30',budget:280000},{label:'Year 3 (FY2025-26)',start:'2025-07-01',end:'2026-06-30',budget:280000}]},
+    {id:11,title:'NSF CAREER: Quantum Materials',grantId:'NSF-2023-PHY-445',sponsor:'NSF',piId:2,status:'Active',start:'2024-01-01',end:'2028-12-31',notes:'',
+     yearBudgets:[{label:'Year 1 (2024)',start:'2024-01-01',end:'2024-12-31',budget:100000},{label:'Year 2 (2025)',start:'2025-01-01',end:'2025-12-31',budget:105000},{label:'Year 3 (2026)',start:'2026-01-01',end:'2026-12-31',budget:100000},{label:'Year 4 (2027)',start:'2027-01-01',end:'2027-12-31',budget:100000},{label:'Year 5 (2028)',start:'2028-01-01',end:'2028-12-31',budget:95000}]},
+    {id:12,title:'DOE: Carbon Sequestration Study',grantId:'DOE-ES-2024-112',sponsor:'DOE',piId:3,status:'Active',start:'2024-04-01',end:'2027-03-31',notes:'',
+     yearBudgets:[{label:'Year 1 (FY2024-25)',start:'2024-04-01',end:'2025-03-31',budget:110000},{label:'Year 2 (FY2025-26)',start:'2025-04-01',end:'2026-03-31',budget:110000},{label:'Year 3 (FY2026-27)',start:'2026-04-01',end:'2027-03-31',budget:100000}]},
+    {id:13,title:'NIH R21: CRISPR Gene Editing',grantId:'R21CA222111',sponsor:'NIH',piId:1,status:'Pending',start:'2025-01-01',end:'2026-12-31',notes:'',
+     yearBudgets:[{label:'Year 1 (2025)',start:'2025-01-01',end:'2025-12-31',budget:140000},{label:'Year 2 (2026)',start:'2026-01-01',end:'2026-12-31',budget:135000}]},
+  ];
+  state.users=[
+    {id:20,first:'Admin',last:'User',email:'admin@univ.edu',role:'Admin',grantIds:[10,11,12,13]},
+    {id:21,first:'Margaret',last:'Chen',email:'mchen@univ.edu',role:'PI',grantIds:[10,13]},
+    {id:22,first:'David',last:'Torres',email:'dtorres@univ.edu',role:'PI',grantIds:[11]},
+    {id:23,first:'Amara',last:'Okafor',email:'aokafor@univ.edu',role:'PI',grantIds:[12]},
+    {id:24,first:'Jordan',last:'Kim',email:'jkim@univ.edu',role:'Researcher',grantIds:[10,13]},
+    {id:25,first:'Sofia',last:'Reyes',email:'sreyes@univ.edu',role:'Finance',grantIds:[10,11,12,13]},
+    {id:26,first:'Alex',last:'Nguyen',email:'anguyen@univ.edu',role:'Researcher',grantIds:[11]},
+  ];
+  // Orders: efcaStatus + efcaRef for EFCA management
+  state.orders=[
+    {id:30,grantId:10,grantYear:'Year 1 (FY2023-24)',userId:24,desc:'Lab reagents – Q3 batch',vendor:'Sigma-Aldrich',amount:4200,date:'2024-09-12',category:'Supplies',just:'Protein assay.',efcaStatus:'EFCA Approved',efcaRef:'EFCA-2024-031',stages:{efca:true,req:true,reqRef:'REQ-40',po:true,poRef:'PO-2024-0031',invoice:true,invoiceRef:'INV-SA-20240922',paid:true}},
+    {id:31,grantId:10,grantYear:'Year 2 (FY2024-25)',userId:21,desc:'Liquid nitrogen annual supply',vendor:'AirGas Inc.',amount:9600,date:'2024-10-01',category:'Supplies',just:'Cryogenic storage.',efcaStatus:'EFCA Approved',efcaRef:'EFCA-2024-035',stages:{efca:true,req:true,reqRef:'REQ-43',po:true,poRef:'PO-2024-0035',invoice:true,invoiceRef:'INV-AG-20241001',paid:false}},
+    {id:32,grantId:11,grantYear:'Year 1 (2024)',userId:26,desc:'Oscilloscope – Tektronix MDO34',vendor:'Tektronix',amount:9800,date:'2024-10-18',category:'Equipment',just:'Quantum measurements.',efcaStatus:'EFCA Approved',efcaRef:'EFCA-2024-042',stages:{efca:true,req:true,reqRef:'REQ-41',po:true,poRef:'PO-2024-0042',invoice:true,invoiceRef:'INV-TEK-20241020',paid:false}},
+    {id:33,grantId:12,grantYear:'Year 1 (FY2024-25)',userId:23,desc:'Soil sampling kits (100 units)',vendor:'EcoSupply Co.',amount:2150,date:'2024-10-14',category:'Supplies',just:'Field sampling.',efcaStatus:'EFCA Approved',efcaRef:'EFCA-2024-044',stages:{efca:true,req:true,reqRef:'REQ-42',po:true,poRef:'PO-2024-0038',invoice:false,paid:false}},
+    {id:34,grantId:10,grantYear:'Year 2 (FY2024-25)',userId:24,desc:'Centrifuge replacement rotor',vendor:'Beckman Coulter',amount:3400,date:'2024-11-05',category:'Equipment',just:'Safety repair.',efcaStatus:'EFCA Approved',efcaRef:'EFCA-2024-051',stages:{efca:true,req:true,reqRef:'REQ-45',po:false,paid:false}},
+    {id:35,grantId:13,grantYear:'Year 1 (2025)',userId:21,desc:'CRISPR guide RNA synthesis',vendor:'IDT Genomics',amount:6700,date:'2024-09-28',category:'Services',just:'Pre-synthesis.',efcaStatus:'Pending EFCA',efcaRef:'',stages:{efca:false,req:false,paid:false}},
+    {id:36,grantId:11,grantYear:'Year 1 (2024)',userId:26,desc:'Signal generator HP 33120A',vendor:'Keysight',amount:4500,date:'2024-11-12',category:'Equipment',just:'Lab upgrade.',efcaStatus:'Pending EFCA',efcaRef:'',stages:{efca:false,req:false,paid:false}},
+  ];
+  // Requisitions: reqNumber field, linkedOrderId, linkedPoId
+  state.requisitions=[
+    {id:40,grantId:10,grantYear:'Year 1 (FY2023-24)',userId:24,reqNumber:'REQ-40',desc:'Lab reagents – Q3 batch',vendor:'Sigma-Aldrich',amount:4200,status:'Approved',date:'2024-09-10',notes:'',linkedOrderId:30,linkedPoId:50,attachments:[]},
+    {id:41,grantId:11,grantYear:'Year 1 (2024)',userId:26,reqNumber:'REQ-41',desc:'Oscilloscope – Tektronix MDO34',vendor:'Tektronix',amount:9800,status:'Approved',date:'2024-10-15',notes:'',linkedOrderId:32,linkedPoId:53,attachments:[]},
+    {id:42,grantId:12,grantYear:'Year 1 (FY2024-25)',userId:23,reqNumber:'REQ-42',desc:'Soil sampling kits',vendor:'EcoSupply Co.',amount:2150,status:'Approved',date:'2024-10-12',notes:'',linkedOrderId:33,linkedPoId:52,attachments:[]},
+    {id:43,grantId:10,grantYear:'Year 2 (FY2024-25)',userId:21,reqNumber:'REQ-43',desc:'Liquid nitrogen annual contract',vendor:'AirGas Inc.',amount:9600,status:'Approved',date:'2024-08-05',notes:'Annual blanket PO.',linkedOrderId:31,linkedPoId:51,attachments:[]},
+    {id:44,grantId:13,grantYear:'Year 1 (2025)',userId:21,reqNumber:'REQ-44',desc:'CRISPR guide RNA synthesis',vendor:'IDT Genomics',amount:6700,status:'Submitted',date:'2024-09-25',notes:'Pending EFCA first.',linkedOrderId:35,linkedPoId:null,attachments:[]},
+    {id:45,grantId:10,grantYear:'Year 2 (FY2024-25)',userId:24,reqNumber:'REQ-45',desc:'Centrifuge replacement rotor',vendor:'Beckman Coulter',amount:3400,status:'Approved',date:'2024-11-03',notes:'',linkedOrderId:34,linkedPoId:null,attachments:[]},
+  ];
+  // POs: linkedReqId, linkedOrderId
+  state.pos=[
+    {id:50,grantId:10,grantYear:'Year 1 (FY2023-24)',number:'PO-2024-0031',desc:'Lab reagents Q3',vendor:'Sigma-Aldrich',amount:4200,enc:0,status:'Closed',date:'2024-09-13',req:'REQ-40',linkedReqId:40,linkedOrderId:30,attachments:[]},
+    {id:51,grantId:10,grantYear:'Year 2 (FY2024-25)',number:'PO-2024-0035',desc:'Liquid nitrogen annual',vendor:'AirGas Inc.',amount:9600,enc:3200,status:'Open',date:'2024-08-10',req:'REQ-43',linkedReqId:43,linkedOrderId:31,attachments:[]},
+    {id:52,grantId:12,grantYear:'Year 1 (FY2024-25)',number:'PO-2024-0038',desc:'Soil sampling kits',vendor:'EcoSupply Co.',amount:2150,enc:2150,status:'Open',date:'2024-10-15',req:'REQ-42',linkedReqId:42,linkedOrderId:33,attachments:[]},
+    {id:53,grantId:11,grantYear:'Year 1 (2024)',number:'PO-2024-0042',desc:'Oscilloscope MDO34',vendor:'Tektronix',amount:9800,enc:9800,status:'Open',date:'2024-10-18',req:'REQ-41',linkedReqId:41,linkedOrderId:32,attachments:[]},
+  ];
+  // Invoices: linkedPoId, linkedOrderId
+  state.invoices=[
+    {id:60,grantId:10,grantYear:'Year 1 (FY2023-24)',num:'INV-SA-20240922',vendor:'Sigma-Aldrich',po:'PO-2024-0031',linkedPoId:50,linkedOrderId:30,amount:4200,date:'2024-09-22',due:'2024-10-22',desc:'Lab reagents Q3',attachments:[],
+     payments:[{id:601,amount:4200,date:'2024-10-15',note:'Full payment',status:'Paid'}]},
+    {id:61,grantId:10,grantYear:'Year 2 (FY2024-25)',num:'INV-AG-20241001',vendor:'AirGas Inc.',po:'PO-2024-0035',linkedPoId:51,linkedOrderId:31,amount:9600,date:'2024-10-01',due:'2025-06-30',desc:'Nitrogen annual contract',attachments:[],
+     payments:[{id:611,amount:3200,date:'2024-10-31',note:'Oct installment',status:'Paid'},{id:612,amount:3200,date:'2024-11-30',note:'Nov installment',status:'Paid'},{id:613,amount:3200,date:'2024-12-31',note:'Dec installment',status:'Pending'}]},
+    {id:62,grantId:12,grantYear:'Year 1 (FY2024-25)',num:'INV-ECO-20241018',vendor:'EcoSupply Co.',po:'PO-2024-0038',linkedPoId:52,linkedOrderId:33,amount:2150,date:'2024-10-18',due:'2024-11-17',desc:'Soil sampling kits',attachments:[],
+     payments:[{id:621,amount:2150,date:'2024-11-10',note:'',status:'Pending'}]},
+    {id:63,grantId:11,grantYear:'Year 1 (2024)',num:'INV-TEK-20241020',vendor:'Tektronix',po:'PO-2024-0042',linkedPoId:53,linkedOrderId:32,amount:9800,date:'2024-10-20',due:'2024-12-20',desc:'Oscilloscope MDO34',attachments:[],
+     payments:[{id:631,amount:5000,date:'2024-11-15',note:'First payment',status:'Paid'},{id:632,amount:4800,date:'2024-12-15',note:'Final payment',status:'Pending'}]},
+  ];
+}
+
+// ═══════════════════════════════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════════════════════════════
+function navigate(page, grantId){
+  // Guard admin-only pages
+  if(['pis','users'].includes(page)&&!isAdmin()){toast('Administrator access required.');return;}
+  // Guard grant-detail: only show grants the user can see
+  if(page==='grant-detail'&&grantId&&!isAdmin()){
+    if(!auth.currentUser?.grantIds?.includes(grantId)){toast('You do not have access to this grant.');return;}
+  }
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  state.currentPage=page;
+  if(grantId)state.currentGrantId=grantId;
+
+  // Pages that are sub-tabs within the procurement page
+  const procSubTabMap={efca:'efca',requisitions:'reqs',po:'pos',invoices:'invs'};
+  const isProcSub=procSubTabMap.hasOwnProperty(page);
+  const effectivePage=isProcSub?'procurement':page;
+
+  const titles={dashboard:'Dashboard',grants:'Grants','grant-detail':'Grant Detail',
+    procurement:'Orders & Approvals',pis:'Principal Investigators',users:'Users & Access'};
+  document.getElementById('topbarTitle').textContent=titles[effectivePage]||effectivePage;
+
+  // Show/hide pages — sub-tab pages all map to the procurement page
+  const el=document.getElementById('page-'+effectivePage);
+  if(el)el.classList.add('active');
+
+  // Sidebar highlight — sub-tab nav items and the parent both get active
+  document.querySelectorAll('.nav-item').forEach(n=>{
+    const oc=n.getAttribute('onclick');
+    // Highlight the parent "Orders & Approvals" for all procurement-related pages
+    if(isProcSub||page==='procurement'){
+      if(oc===`navigate('procurement')`){n.classList.add('active');}
+    }
+    // Also highlight the specific sub-nav item
+    if(oc===`navigate('${page}')`){n.classList.add('active');}
+    // Non-procurement pages
+    if(!isProcSub&&page!=='procurement'){
+      const nm={dashboard:'dashboard',grants:'grants','grant-detail':'grants',pis:'pis',users:'users'};
+      if(oc===`navigate('${nm[page]||page}')`){n.classList.add('active');}
+    }
+  });
+
+  // Topbar action button — context-aware per sub-tab
+  const subTabActions={
+    efca:`<button class="btn btn-primary" onclick="openNewModal('modal-order')">+ New EFCA Request</button>`,
+    requisitions:`<button class="btn btn-primary" onclick="openNewModal('modal-req')">+ New Requisition</button>`,
+    po:`<button class="btn btn-primary" onclick="openNewModal('modal-po')">+ New PO</button>`,
+    invoices:`<button class="btn btn-primary" onclick="openNewModal('modal-invoice')">+ New Invoice</button>`,
+  };
+  const actions={
+    grants:`<button class="btn btn-primary" onclick="openNewModal('modal-grant')">+ New Grant</button>`,
+    procurement:`<button class="btn btn-primary" onclick="openNewModal('modal-order')">+ New EFCA Request</button>`,
+    pis:`<button class="btn btn-primary" onclick="openNewModal('modal-pi')">+ Add PI</button>`,
+    users:`<button class="btn btn-primary" onclick="openNewModal('modal-user')">+ Add User</button>`,
+    'grant-detail':`<button class="btn btn-primary" onclick="openNewModal('modal-order')">+ New EFCA Request</button>`,
+  };
+  document.getElementById('topbarActions').innerHTML=subTabActions[page]||actions[effectivePage]||'';
+
+  // If navigating to a sub-tab, activate that sub-tab within the procurement page
+  if(isProcSub){
+    procSubTab(procSubTabMap[page]);
+  } else if(page==='procurement'){
+    // Activate chain sub-tab by default when navigating to the parent
+    procSubTab(state.currentProcSubTab||'chain');
+  }
+
+  const renders={dashboard:renderDashboard,grants:renderGrants,'grant-detail':renderGrantDetail,
+    pis:renderPIs,users:renderUsers};
+  if(renders[page])renders[page]();
+  // Procurement-page renders are handled by procSubTab()
+  if(page==='procurement')renderProcurement();
+}
+
+// ═══════════════════════════════════════════════════════
+// PROC SUB-TAB CONTROLLER
+// ═══════════════════════════════════════════════════════
+function procSubTab(tab, el){
+  state.currentProcSubTab = tab;
+  // Update tab highlight
+  document.querySelectorAll('#procSubTabs .tab').forEach(t=>t.classList.remove('active'));
+  if(el){ el.classList.add('active'); }
+  else {
+    const tabOrder = ['chain','efca','reqs','pos','invs'];
+    const tabs = document.querySelectorAll('#procSubTabs .tab');
+    const idx = tabOrder.indexOf(tab);
+    if(tabs[idx]) tabs[idx].classList.add('active');
+  }
+  // Show/hide sub-tab panels
+  ['chain','efca','reqs','pos','invs'].forEach(t=>{
+    const el=document.getElementById(`proc-subtab-${t}`);
+    if(el) el.style.display = t===tab?'':'none';
+  });
+  // Update topbar action button to match context
+  const subTabActions={
+    chain:`<button class="btn btn-primary" onclick="openNewModal('modal-order')">+ New EFCA Request</button>`,
+    efca:`<button class="btn btn-primary" onclick="openNewModal('modal-order')">+ New EFCA Request</button>`,
+    reqs:`<button class="btn btn-primary" onclick="openNewModal('modal-req')">+ New Requisition</button>`,
+    pos:`<button class="btn btn-primary" onclick="openNewModal('modal-po')">+ New PO</button>`,
+    invs:`<button class="btn btn-primary" onclick="openNewModal('modal-invoice')">+ New Invoice</button>`,
+  };
+  document.getElementById('topbarActions').innerHTML=subTabActions[tab]||'';
+  // Render the sub-tab content
+  if(tab==='chain') renderProcurement();
+  else if(tab==='efca') renderEFCA();
+  else if(tab==='reqs') renderReqsInline();
+  else if(tab==='pos') renderPOsInline();
+  else if(tab==='invs') renderInvoicesInline();
+}
+
+// Inline render helpers that target the procurement sub-tab DOM nodes
+function renderReqsInline(search){
+  populateFilterSelects();
+  const q=(search||'').toLowerCase();
+  const gF=document.getElementById('procReqGrantFilter')?.value;
+  const sF=document.getElementById('procReqStatusFilter')?.value;
+  let rows=scopeByGrant(state.requisitions).filter(r=>{
+    if(q&&!r.desc.toLowerCase().includes(q))return false;
+    if(gF&&String(r.grantId)!==gF)return false;
+    if(sF&&r.status!==sF)return false;
+    return true;
+  });
+  document.getElementById('procReqsTable').innerHTML=rows.length?reqsTableHTML(rows):`<div class="empty-state"><div class="icon">◧</div><p>No requisitions found.</p></div>`;
+}
+function renderPOsInline(search){
+  populateFilterSelects();
+  const q=(search||'').toLowerCase();
+  const gF=document.getElementById('procPoGrantFilter')?.value;
+  const sF=document.getElementById('procPoStatusFilter')?.value;
+  let rows=scopeByGrant(state.pos).filter(p=>{
+    if(q&&!p.number.toLowerCase().includes(q)&&!p.desc.toLowerCase().includes(q))return false;
+    if(gF&&String(p.grantId)!==gF)return false;
+    if(sF&&p.status!==sF)return false;
+    return true;
+  });
+  document.getElementById('procPosTable').innerHTML=rows.length?posTableHTML(rows):`<div class="empty-state"><div class="icon">◪</div><p>No POs found.</p></div>`;
+}
+function renderInvoicesInline(search){
+  populateFilterSelects();
+  const q=(search||'').toLowerCase();
+  const gF=document.getElementById('procInvGrantFilter')?.value;
+  const sF=document.getElementById('procInvStatusFilter')?.value;
+  let rows=scopeByGrant(state.invoices).filter(i=>{
+    if(q&&!i.num.toLowerCase().includes(q)&&!i.vendor.toLowerCase().includes(q))return false;
+    if(gF&&String(i.grantId)!==gF)return false;
+    if(sF&&invComputedStatus(i)!==sF)return false;
+    return true;
+  });
+  document.getElementById('procInvsTable').innerHTML=rows.length?invoicesTableHTML(rows):`<div class="empty-state"><div class="icon">◨</div><p>No invoices found.</p></div>`;
+}
+
+// ═══════════════════════════════════════════════════════
+// DASHBOARD
+// ═══════════════════════════════════════════════════════
+function renderDashboard(){
+  const piSel=document.getElementById('dashPIFilter');
+  if(piSel.options.length<=1)state.pis.forEach(p=>{const o=document.createElement('option');o.value=p.id;o.textContent=`${p.first} ${p.last}`;piSel.appendChild(o);});
+  const piF=piSel.value;
+  const totBudget=state.grants.reduce((s,g)=>s+grantTotalBudget(g),0);
+  const totSpent=state.grants.reduce((s,g)=>s+grantSpent(g.id),0);
+  const totEnc=state.grants.reduce((s,g)=>s+grantEncumbered(g.id),0);
+  const pendEFCA=state.orders.filter(o=>o.efcaStatus==='Pending EFCA').length;
+  const pendInv=state.invoices.filter(i=>invComputedStatus(i)==='Pending').length;
+
+  document.getElementById('dashTotals').innerHTML=`
+    <div class="totals-card blue"><div class="lbl">Total Budget</div><div class="val">${fmt(totBudget)}</div><div class="sub">${state.grants.filter(g=>g.status==='Active').length} active grants</div></div>
+    <div class="totals-card"><div class="lbl">Total Spent</div><div class="val">${fmt(totSpent)}</div><div class="sub">${((totSpent/(totBudget||1))*100).toFixed(1)}%</div></div>
+    <div class="totals-card amber"><div class="lbl">Encumbered</div><div class="val">${fmt(totEnc)}</div><div class="sub">Open POs</div></div>
+    <div class="totals-card green"><div class="lbl">Available</div><div class="val">${fmt(totBudget-totSpent-totEnc)}</div></div>
+    <div class="totals-card"><div class="lbl">Pending EFCA</div><div class="val" style="color:var(--amber)">${pendEFCA}</div><div class="sub">${pendInv} invoices pending</div></div>
+  `;
+
+  const filtered=visibleGrants().filter(g=>!piF||String(g.piId)===piF);
+  document.getElementById('dashGrantBlocks').innerHTML=filtered.map(g=>{
+    const years=grantYears(g),spent=grantSpent(g.id),enc=grantEncumbered(g.id),avail=grantAvailable(g.id,'all'),totB=grantTotalBudget(g);
+    const pct=Math.max(0,Math.min(100,((spent+enc)/(totB||1))*100));
+    const cls=pct<60?'fill-green':pct<85?'fill-amber':'fill-red';
+    const recentOrds=state.orders.filter(o=>o.grantId===g.id).sort((a,b)=>b.date.localeCompare(a.date)).slice(0,3);
+    const pendLocal=state.orders.filter(o=>o.grantId===g.id&&o.efcaStatus==='Pending EFCA').length;
+    return`<div class="dash-grant-block">
+      <div class="dash-grant-header" onclick="toggleDashBlock(${g.id})">
+        <div>
+          <div style="display:flex;align-items:center;gap:10px"><span style="font-family:'DM Serif Display',serif;font-size:15px">${g.title}</span>${badge(g.status)}</div>
+          <div style="font-size:12px;color:var(--gray-400);margin-top:1px">${piName(g.piId)} · ${g.grantId} · ${g.sponsor} · ${fmtDate(g.start)} – ${fmtDate(g.end)}</div>
+        </div>
+        <span id="dash-toggle-${g.id}" style="color:var(--gray-400);font-size:18px">▾</span>
+      </div>
+      <div id="dash-body-${g.id}" class="dash-grant-body">
+        <div class="dash-metrics-row">
+          <div class="dash-metric blue"><div class="lbl">Budget</div><div class="val">${fmt(totB)}</div><div class="sub">${years.length} yr(s)</div></div>
+          <div class="dash-metric"><div class="lbl">Spent</div><div class="val">${fmt(spent)}</div><div class="sub">${((spent/(totB||1))*100).toFixed(1)}%</div></div>
+          <div class="dash-metric amber"><div class="lbl">Encumbered</div><div class="val">${fmt(enc)}</div></div>
+          <div class="dash-metric ${avail<0?'red':'green'}"><div class="lbl">Available</div><div class="val">${fmt(avail)}</div></div>
+          <div class="dash-metric"><div class="lbl">Pend. EFCA</div><div class="val" style="color:var(--amber)">${pendLocal}</div></div>
+        </div>
+        <div class="progress-bar" style="margin-bottom:12px"><div class="progress-fill ${cls}" style="width:${pct}%"></div></div>
+        ${years.length>1?`<div style="display:flex;gap:7px;flex-wrap:wrap;margin-bottom:12px">${years.map(y=>{const yav=grantYearBudget(g,y.label)-grantSpent(g.id,y.label)-grantEncumbered(g.id,y.label);return`<div style="border:var(--border);border-radius:7px;padding:8px 11px;background:var(--white);min-width:140px;flex:1"><div style="font-size:10px;font-weight:600;color:var(--gray-400);margin-bottom:4px">${y.label}</div><div style="font-size:11px;color:var(--gray-600)">Budget: <span style="font-family:'DM Mono',monospace">${fmt(y.budget)}</span></div><div style="font-size:11px;font-weight:600;color:${yav<0?'var(--red)':'var(--green)'}">Avail: <span style="font-family:'DM Mono',monospace">${fmt(yav)}</span></div></div>`;}).join('')}</div>`:''}
+        ${recentOrds.length?`<div style="font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--gray-400);margin-bottom:7px">Recent Orders</div>
+        <div class="table-wrap" style="margin-bottom:0"><table><thead><tr><th>Date</th><th>Description</th><th>Amount</th><th>EFCA</th><th>Stage</th></tr></thead>
+        <tbody>${recentOrds.map(o=>`<tr><td>${fmtDate(o.date)}</td><td>${o.desc}</td><td class="mono">${fmt(o.amount)}</td><td>${badge(o.efcaStatus||'Pending EFCA')}</td><td>${badge(orderCurrentStage(o),STAGE_BADGE[orderCurrentStage(o)])}</td></tr>`).join('')}</tbody></table></div>
+        <div style="text-align:right;margin-top:8px"><span class="btn btn-secondary btn-sm" onclick="navigate('grant-detail',${g.id})">View full grant →</span></div>`:`<div style="font-size:12px;color:var(--gray-400)">No orders yet.</div>`}
+      </div>
+    </div>`;
+  }).join('')||`<div class="empty-state"><div class="icon">◎</div><p>No grants found.</p></div>`;
+}
+function toggleDashBlock(gid){const b=document.getElementById(`dash-body-${gid}`),ic=document.getElementById(`dash-toggle-${gid}`);if(!b)return;const h=b.style.display==='none';b.style.display=h?'':'none';ic.textContent=h?'▾':'▸';}
+
+// ═══════════════════════════════════════════════════════
+// EFCA APPROVALS PAGE
+// ═══════════════════════════════════════════════════════
+function renderEFCA(search){
+  populateFilterSelects();
+  const q=(search||'').toLowerCase();
+  const gF=document.getElementById('efcaGrantFilter')?.value;
+  const sF=document.getElementById('efcaStatusFilter')?.value;
+  let rows=scopeByGrant(state.orders).filter(o=>{
+    if(q&&!o.desc.toLowerCase().includes(q)&&!o.vendor.toLowerCase().includes(q))return false;
+    if(gF&&String(o.grantId)!==gF)return false;
+    if(sF&&(o.efcaStatus||'Pending EFCA')!==sF)return false;
+    return true;
+  });
+  if(!rows.length){document.getElementById('efcaList').innerHTML=`<div class="empty-state"><div class="icon">✓</div><p>No EFCA records found.</p></div>`;return;}
+  document.getElementById('efcaList').innerHTML=rows.map(o=>{
+    const g=grantById(o.grantId);
+    return`<div class="efca-card">
+      <div class="efca-card-head">
+        <div>
+          <h3>${o.desc}</h3>
+          <div class="meta">${g.grantId||'—'} · ${o.grantYear||'—'} · ${fmtDate(o.date)}</div>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center">
+          ${badge(o.efcaStatus||'Pending EFCA')}
+          <button class="btn btn-secondary btn-sm" onclick="openEditRecord('order',${o.id})">Edit</button>
+          <button class="btn btn-sm" style="background:var(--teal-light);color:var(--teal);border:1.5px solid var(--teal)" onclick="navigate('procurement');setTimeout(()=>{procSubTab('chain');scrollToProcCard(${o.id});},250)">View Chain</button>
+        </div>
+      </div>
+      <div class="efca-meta-row">
+        <div class="efca-meta-item">Vendor: <span>${o.vendor}</span></div>
+        <div class="efca-meta-item">Amount: <span>${fmt(o.amount)}</span></div>
+        <div class="efca-meta-item">Category: <span>${o.category||'—'}</span></div>
+        <div class="efca-meta-item">Requestor: <span>${userName(o.userId)}</span></div>
+        ${o.efcaRef?`<div class="efca-meta-item">EFCA Ref: <span style="font-family:'DM Mono',monospace">${o.efcaRef}</span></div>`:''}
+      </div>
+      <div style="font-size:12px;color:var(--gray-600);font-style:italic">${o.just||''}</div>
+      <div style="display:flex;align-items:center;gap:10px;margin-top:10px">
+        ${pipelineHTML(o)}
+        <span style="font-size:12px;color:var(--gray-400)">${orderCurrentStage(o)}</span>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════════════════════════
+// PROCUREMENT CHAIN VIEW (Orders & Approvals)
+// ═══════════════════════════════════════════════════════
+function renderProcurement(search){
+  populateFilterSelects();
+  const q=(search||document.getElementById('procSearch')?.value||'').toLowerCase();
+  const gF=document.getElementById('procGrantFilter')?.value;
+  const sF=document.getElementById('procStatusFilter')?.value;
+  let rows=scopeByGrant(state.orders).filter(o=>{
+    if(q&&!o.desc.toLowerCase().includes(q)&&!o.vendor.toLowerCase().includes(q))return false;
+    if(gF&&String(o.grantId)!==gF)return false;
+    if(sF&&orderCurrentStage(o)!==sF)return false;
+    return true;
+  });
+  if(!rows.length){document.getElementById('procList').innerHTML=`<div class="empty-state"><div class="icon">◈</div><p>No procurement records found.</p></div>`;return;}
+  document.getElementById('procList').innerHTML=procChainTableHTML(rows);
+}
+
+// ═══════════════════════════════════════════════════════
+// CHAIN DRAWER — open/close
+// ═══════════════════════════════════════════════════════
+let _drawerOrderId = null;
+
+function openChainDrawer(orderId){
+  _drawerOrderId = orderId;
+  const o = state.orders.find(x=>x.id===orderId); if(!o) return;
+  const g = grantById(o.grantId);
+  document.getElementById('cd-title').textContent = o.desc;
+  document.getElementById('cd-meta').textContent =
+    `${g.grantId||'—'} · ${o.grantYear||'—'} · ${o.vendor} · ${fmt(o.amount)}`;
+  document.getElementById('cd-body').innerHTML = chainDrawerBody(o);
+  document.getElementById('chain-drawer-overlay').classList.add('open');
+  document.getElementById('chain-drawer').classList.add('open');
+}
+
+function closeChainDrawer(){
+  document.getElementById('chain-drawer-overlay').classList.remove('open');
+  document.getElementById('chain-drawer').classList.remove('open');
+  _drawerOrderId = null;
+}
+
+// Re-render drawer in place (after edits/creates)
+function refreshDrawer(){
+  if(_drawerOrderId) openChainDrawer(_drawerOrderId);
+}
+
+function chainDrawerBody(o){
+  const si = orderStageIndex(o);
+  const req  = state.requisitions.find(r=>r.linkedOrderId===o.id)||null;
+  const po   = req ? state.pos.find(p=>p.linkedReqId===req.id)||null : null;
+  const invs = po  ? getLinkedInvoices(po) : [];
+
+  const iconCls = (done, active) => done?'done':active?'active':'';
+  const lineCls = (done) => done?'done':'';
+
+  // — STEP 1: EFCA —
+  const efcaDone = o.efcaStatus==='EFCA Approved';
+  const step1 = `
+    <div class="ds-step">
+      <div class="ds-left">
+        <div class="ds-icon ${iconCls(efcaDone,true)}">✓</div>
+        <div class="ds-line ${lineCls(efcaDone)}"></div>
+      </div>
+      <div class="ds-content">
+        <div class="ds-label ${efcaDone?'done':'active'}">1 · EFCA Approval</div>
+        <div class="ds-box">
+          <div class="ds-row"><span class="ds-lbl">Status</span>${badge(o.efcaStatus||'Pending EFCA')}</div>
+          ${o.efcaRef?`<div class="ds-row"><span class="ds-lbl">Ref #</span><span class="ds-val">${o.efcaRef}</span></div>`:''}
+          <div class="ds-row"><span class="ds-lbl">Amount</span><span class="ds-val">${fmt(o.amount)}</span></div>
+          <div class="ds-row"><span class="ds-lbl">Requestor</span><span class="ds-val">${userName(o.userId)}</span></div>
+          ${o.just?`<div class="ds-row"><span class="ds-lbl">Justification</span><span class="ds-val" style="font-size:11px;font-family:'DM Sans',sans-serif;color:var(--gray-600)">${o.just}</span></div>`:''}
+          <div class="ds-actions">
+            <button class="btn btn-secondary btn-sm" onclick="openEditRecord('order',${o.id});closeChainDrawer()">✎ Edit EFCA</button>
+          </div>
+        </div>
+      </div>
+    </div>`;
+
+  // — STEP 2: REQUISITION —
+  const step2 = `
+    <div class="ds-step">
+      <div class="ds-left">
+        <div class="ds-icon ${iconCls(!!req, efcaDone)}">${req?'✓':'2'}</div>
+        <div class="ds-line ${lineCls(!!req)}"></div>
+      </div>
+      <div class="ds-content">
+        <div class="ds-label ${iconCls(!!req, efcaDone)||'pending'}">2 · Requisition</div>
+        ${req ? `<div class="ds-box">
+          <div class="ds-row"><span class="ds-lbl">Req #</span><span class="ds-val">${req.reqNumber||'—'}</span></div>
+          <div class="ds-row"><span class="ds-lbl">Status</span>${badge(req.status)}</div>
+          <div class="ds-row"><span class="ds-lbl">Date</span><span class="ds-val">${fmtDate(req.date)}</span></div>
+          <div class="ds-row"><span class="ds-lbl">Amount</span><span class="ds-val">${fmt(req.amount)}</span></div>
+          ${req.notes?`<div class="ds-row"><span class="ds-lbl">Notes</span><span class="ds-val" style="font-size:11px;font-family:'DM Sans',sans-serif;color:var(--gray-600)">${req.notes}</span></div>`:''}
+          <div class="ds-actions">
+            <button class="btn btn-secondary btn-sm" onclick="openEditRecord('req',${req.id});closeChainDrawer()">✎ Edit Req</button>
+            ${!po?`<button class="btn btn-green btn-sm" onclick="openEnterPOOnReq(${req.id});closeChainDrawer()">+ Enter PO</button>`:''}
+          </div>
+        </div>` : `<div class="ds-box empty">
+          <p>No requisition linked yet.</p>
+          <button class="btn btn-green btn-sm" onclick="openNewReqForOrder(${o.id});closeChainDrawer()">+ Create Requisition</button>
+        </div>`}
+      </div>
+    </div>`;
+
+  // — STEP 3: PURCHASE ORDER —
+  const step3 = `
+    <div class="ds-step">
+      <div class="ds-left">
+        <div class="ds-icon ${iconCls(!!po, !!req)}">${po?'✓':'3'}</div>
+        <div class="ds-line ${lineCls(!!po)}"></div>
+      </div>
+      <div class="ds-content">
+        <div class="ds-label ${iconCls(!!po,!!req)||'pending'}">3 · Purchase Order</div>
+        ${po ? `<div class="ds-box">
+          <div class="ds-row"><span class="ds-lbl">PO #</span><span class="ds-val">${po.number}</span></div>
+          <div class="ds-row"><span class="ds-lbl">Status</span>${badge(po.status)}</div>
+          <div class="ds-row"><span class="ds-lbl">Date</span><span class="ds-val">${fmtDate(po.date)}</span></div>
+          <div class="ds-row"><span class="ds-lbl">PO Amount</span><span class="ds-val">${fmt(po.amount)}</span></div>
+          <div class="ds-row"><span class="ds-lbl">Encumbered</span><span class="ds-val" style="color:var(--amber)">${fmt(po.enc)}</span></div>
+          <div class="ds-actions">
+            <button class="btn btn-secondary btn-sm" onclick="openEditRecord('po',${po.id});closeChainDrawer()">✎ Edit PO</button>
+            <button class="btn btn-green btn-sm" onclick="openEnterInvoiceOnPO(${po.id});closeChainDrawer()">+ Enter Invoice</button>
+          </div>
+        </div>` : `<div class="ds-box empty">
+          <p>${req?'Approved — PO not yet received.':'Requisition needed first.'}</p>
+          ${req?`<button class="btn btn-green btn-sm" onclick="openEnterPOOnReq(${req.id});closeChainDrawer()">+ Enter PO</button>`:''}
+        </div>`}
+      </div>
+    </div>`;
+
+  // — STEP 4: INVOICE(S) —
+  const allPaid = invs.length && invs.every(i=>invComputedStatus(i)==='Paid');
+  const step4 = `
+    <div class="ds-step">
+      <div class="ds-left">
+        <div class="ds-icon ${iconCls(invs.length>0, !!po)}">${invs.length?'✓':'4'}</div>
+        <div class="ds-line ${lineCls(allPaid)}"></div>
+      </div>
+      <div class="ds-content">
+        <div class="ds-label ${iconCls(invs.length>0,!!po)||'pending'}">4 · Invoice(s)</div>
+        ${invs.length ? invs.map(i=>{
+          const cs=invComputedStatus(i),paid=invTotalPaid(i),rem=invRemaining(i);
+          return `<div class="ds-box" style="margin-bottom:8px">
+            <div class="ds-row"><span class="ds-lbl">Invoice #</span><span class="ds-val">${i.num}</span></div>
+            <div class="ds-row"><span class="ds-lbl">Status</span>${badge(cs)}</div>
+            <div class="ds-row"><span class="ds-lbl">Total</span><span class="ds-val">${fmt(i.amount)}</span></div>
+            <div class="ds-row"><span class="ds-lbl">Paid</span><span class="ds-val" style="color:var(--green)">${fmt(paid)}</span></div>
+            <div class="ds-row"><span class="ds-lbl">Remaining</span><span class="ds-val" style="color:${rem>0?'var(--amber)':'var(--gray-400)'}">${fmt(rem)}</span></div>
+            ${(i.payments||[]).length?`<div style="margin-top:7px;padding-top:7px;border-top:1px solid var(--gray-100)">${(i.payments||[]).map(p=>`<div class="ds-row"><span style="font-size:11px;color:var(--gray-400)">${fmtDate(p.date)}</span><span style="font-size:11px">${badge(p.status)} ${fmt(p.amount)}</span></div>`).join('')}</div>`:''}
+            <div class="ds-actions"><button class="btn btn-secondary btn-sm" onclick="openEditRecord('invoice',${i.id});closeChainDrawer()">✎ Edit Invoice</button></div>
+          </div>`;
+        }).join('') : `<div class="ds-box empty">
+          <p>${po?'PO open — no invoice yet.':'PO needed first.'}</p>
+          ${po?`<button class="btn btn-green btn-sm" onclick="openEnterInvoiceOnPO(${po.id});closeChainDrawer()">+ Enter Invoice</button>`:''}
+        </div>`}
+        ${po&&invs.length?`<div style="margin-top:4px"><button class="btn btn-green btn-sm" onclick="openEnterInvoiceOnPO(${po.id});closeChainDrawer()">+ Add Another Invoice</button></div>`:''}
+      </div>
+    </div>`;
+
+  // — STEP 5: FULLY PAID —
+  const step5 = `
+    <div class="ds-step">
+      <div class="ds-left">
+        <div class="ds-icon ${allPaid?'done':invs.length?'active':''}">${allPaid?'✓':'5'}</div>
+      </div>
+      <div class="ds-content" style="padding-bottom:0">
+        <div class="ds-label ${allPaid?'done':invs.length?'active':'pending'}">5 · Fully Paid</div>
+        <div class="ds-box" style="padding:8px 12px">
+          ${allPaid
+            ? `<span style="color:var(--green);font-weight:600">✓ All invoices paid. Complete.</span>`
+            : invs.length
+              ? `<span style="color:var(--amber)">${invs.filter(i=>invComputedStatus(i)==='Paid').length} of ${invs.length} invoice(s) paid.</span>`
+              : `<span style="color:var(--gray-400)">Awaiting invoices.</span>`}
+        </div>
+      </div>
+    </div>`;
+
+  return step1 + step2 + step3 + step4 + step5;
+}
+
+// ───────────────────────────────────────────────────────
+// COMPACT ROW CARD (replaces old expanded card)
+// ───────────────────────────────────────────────────────
+function procChainCardHTML(o){
+  const g   = grantById(o.grantId);
+  const stage = orderCurrentStage(o);
+  const req  = state.requisitions.find(r=>r.linkedOrderId===o.id)||null;
+  const po   = req ? state.pos.find(p=>p.linkedReqId===req.id)||null : null;
+  const invs = po  ? getLinkedInvoices(po) : [];
+  const allPaid = invs.length && invs.every(i=>invComputedStatus(i)==='Paid');
+
+  // Summary blobs for quick context
+  const reqRef  = req  ? `<span class="mono" style="color:var(--accent);font-size:11px">${req.reqNumber}</span>` : `<span style="color:var(--gray-400);font-size:11px">No REQ</span>`;
+  const poRef   = po   ? `<span class="mono" style="color:var(--accent);font-size:11px">${po.number}</span>`     : `<span style="color:var(--gray-400);font-size:11px">No PO</span>`;
+  const invRef  = invs.length ? `<span class="attach-count">🧾 ${invs.length}</span>` : `<span style="color:var(--gray-400);font-size:11px">No INV</span>`;
+
+  return `<tr id="proc-row-${o.id}">
+    <td>
+      <div style="font-size:13px;font-weight:600;color:var(--ink);margin-bottom:2px">${o.desc}</div>
+      <div style="font-size:11px;color:var(--gray-400)">${g.grantId||'—'} · ${o.grantYear||'—'} · ${fmtDate(o.date)}</div>
+    </td>
+    <td style="color:var(--gray-600)">${o.vendor}</td>
+    <td class="mono">${fmt(o.amount)}</td>
+    <td>${badge(o.efcaStatus||'Pending EFCA')}</td>
+    <td>${reqRef}</td>
+    <td>${poRef}</td>
+    <td>${invRef}</td>
+    <td>
+      <div class="pip-click" onclick="openChainDrawer(${o.id})" title="Click to view full chain">
+        ${pipelineHTML(o)}
+        <span class="pip-hint">View chain</span>
+      </div>
+    </td>
+    <td style="white-space:nowrap">
+      <button class="action-btn edit" onclick="openEditRecord('order',${o.id})" title="Edit EFCA">✎</button>
+      <button class="action-btn del" onclick="deleteRecord('orders',${o.id})" title="Delete">✕</button>
+    </td>
+  </tr>`;
+}
+
+// Wrap the rows in a table
+function procChainTableHTML(rows){
+  if(!rows.length) return `<div class="empty-state"><div class="icon">◈</div><p>No procurement records found.</p></div>`;
+  return `<div class="proc-table-wrap"><table>
+    <thead><tr>
+      <th>Description</th><th>Vendor</th><th>Amount</th>
+      <th>EFCA</th><th>Requisition</th><th>PO</th><th>Invoices</th>
+      <th>Progress</th><th></th>
+    </tr></thead>
+    <tbody>${rows.map(o=>procChainCardHTML(o)).join('')}</tbody>
+  </table></div>`;
+}
+
+function scrollToProcCard(orderId){
+  const el=document.getElementById(`proc-row-${orderId}`);
+  if(el)el.scrollIntoView({behavior:'smooth',block:'center'});
+  // Also open the drawer
+  setTimeout(()=>openChainDrawer(orderId), 300);
+}
+
+// ═══════════════════════════════════════════════════════
+// OPEN REQ PRE-FILLED FOR AN ORDER
+// ═══════════════════════════════════════════════════════
+function openNewReqForOrder(orderId){
+  const o=state.orders.find(x=>x.id===orderId);if(!o)return;
+  state.editingId=null;
+  populateModalSelects();
+  document.getElementById('reqModalTitle').textContent='New Requisition';
+  document.getElementById('f-req-grant').value=o.grantId;
+  syncYearSelect('f-req-grant','f-req-year');
+  setTimeout(()=>{
+    document.getElementById('f-req-year').value=o.grantYear||'';
+    document.getElementById('f-req-desc').value=o.desc;
+    document.getElementById('f-req-vendor').value=o.vendor;
+    document.getElementById('f-req-amount').value=o.amount;
+    document.getElementById('f-req-user').value=o.userId;
+    document.getElementById('f-req-date').value=new Date().toISOString().split('T')[0];
+    document.getElementById('f-req-status').value='Submitted';
+    document.getElementById('f-req-efca-ref').value=o.efcaRef||'';
+    document.getElementById('f-req-number-input').value='';
+    // Store orderId for linking
+    document.getElementById('f-req-grant').dataset.linkedOrderId=orderId;
+  },40);
+  state.stagingAttachments.req=[];
+  document.getElementById('req-attach-list').innerHTML='';
+  document.getElementById('modal-req').classList.add('open');
+}
+
+// ═══════════════════════════════════════════════════════
+// ENTER PO INTO REQUISITION MODAL
+// ═══════════════════════════════════════════════════════
+function openEnterPOOnReq(reqId){
+  const r=state.requisitions.find(x=>x.id===reqId);if(!r)return;
+  state.editingId=reqId;
+  populateModalSelects();
+  document.getElementById('reqModalTitle').textContent='Enter PO for Requisition';
+  document.getElementById('f-req-grant').value=r.grantId;
+  syncYearSelect('f-req-grant','f-req-year');
+  setTimeout(()=>{
+    document.getElementById('f-req-year').value=r.grantYear||'';
+    document.getElementById('f-req-desc').value=r.desc;
+    document.getElementById('f-req-vendor').value=r.vendor;
+    document.getElementById('f-req-amount').value=r.amount;
+    document.getElementById('f-req-user').value=r.userId;
+    document.getElementById('f-req-date').value=r.date;
+    document.getElementById('f-req-status').value=r.status;
+    document.getElementById('f-req-notes').value=r.notes||'';
+    document.getElementById('f-req-number-input').value=r.reqNumber||'';
+    document.getElementById('f-req-efca-ref').value=r.efcaRef||'';
+    // Show existing PO if any
+    const existingPO=r.linkedPoId?state.pos.find(p=>p.id===r.linkedPoId):null;
+    if(existingPO){
+      document.getElementById('f-req-po-number').value=existingPO.number;
+      document.getElementById('f-req-po-date').value=existingPO.date;
+      document.getElementById('f-req-po-amount').value=existingPO.amount;
+      document.getElementById('f-req-po-status').value=existingPO.status;
+    }
+    // Scroll to PO section
+    setTimeout(()=>{document.getElementById('req-po-section-label').scrollIntoView({behavior:'smooth',block:'start'});},100);
+  },40);
+  state.stagingAttachments.req=[];
+  renderRecordAttachments('req','req-attach-list',r.attachments||[]);
+  document.getElementById('modal-req').classList.add('open');
+}
+
+// ═══════════════════════════════════════════════════════
+// ENTER INVOICE INTO PO MODAL — inline builder
+// ═══════════════════════════════════════════════════════
+function openEnterInvoiceOnPO(poId){
+  const p=state.pos.find(x=>x.id===poId);if(!p)return;
+  state.editingId=poId;
+  populateModalSelects();
+  document.getElementById('poModalTitle').textContent='Enter Invoice for PO';
+  document.getElementById('f-po-grant').value=p.grantId;
+  syncYearSelect('f-po-grant','f-po-year');
+  // Pre-populate existing PO invoice rows
+  const existingInvs=getLinkedInvoices(p);
+  _poInvoiceRows=existingInvs.map(i=>({id:i.id,existing:true,num:i.num,amount:i.amount,date:i.date,due:i.due,desc:i.desc,status:i.status}));
+  setTimeout(()=>{
+    document.getElementById('f-po-year').value=p.grantYear||'';
+    document.getElementById('f-po-number').value=p.number;
+    document.getElementById('f-po-desc').value=p.desc;
+    document.getElementById('f-po-vendor').value=p.vendor;
+    document.getElementById('f-po-amount').value=p.amount;
+    document.getElementById('f-po-enc').value=p.enc;
+    document.getElementById('f-po-status').value=p.status;
+    document.getElementById('f-po-req').value=p.req||'';
+    renderPOInvoiceBuilder();
+    setTimeout(()=>{document.getElementById('po-inv-builder').scrollIntoView({behavior:'smooth',block:'start'});},100);
+  },40);
+  state.stagingAttachments.po=[];
+  renderRecordAttachments('po','po-attach-list',p.attachments||[]);
+  document.getElementById('modal-po').classList.add('open');
+}
+
+// ═══════════════════════════════════════════════════════
+// PO INLINE INVOICE BUILDER
+// ═══════════════════════════════════════════════════════
+function addPOInvoiceRow(){
+  _poInvoiceRows.push({id:null,existing:false,num:'',amount:'',date:new Date().toISOString().split('T')[0],due:'',desc:'',status:'Pending'});
+  renderPOInvoiceBuilder();
+}
+function removePOInvoiceRow(i){
+  if(_poInvoiceRows[i]?.existing){if(!confirm('Remove this existing invoice link?'))return;}
+  _poInvoiceRows.splice(i,1);renderPOInvoiceBuilder();
+}
+function renderPOInvoiceBuilder(){
+  const container=document.getElementById('po-inv-builder');if(!container)return;
+  if(!_poInvoiceRows.length){container.innerHTML='<div style="font-size:12px;color:var(--gray-400)">No invoices added. Click "+ Add Invoice" below.</div>';return;}
+  container.innerHTML=_poInvoiceRows.map((r,i)=>`<div class="inv-builder-row">
+    <div class="ibr-field"><label>Invoice #</label><input style="padding:6px 9px;font-size:12px" value="${r.num||''}" placeholder="INV-…" oninput="_poInvoiceRows[${i}].num=this.value"></div>
+    <div class="ibr-field"><label>Amount ($)</label><input type="number" style="padding:6px 9px;font-size:12px" value="${r.amount||''}" placeholder="0.00" oninput="_poInvoiceRows[${i}].amount=Number(this.value)"></div>
+    <div class="ibr-field"><label>Invoice Date</label><input type="date" style="padding:6px 9px;font-size:12px" value="${r.date||''}" onchange="_poInvoiceRows[${i}].date=this.value"></div>
+    <div class="ibr-field"><label>Due Date</label><input type="date" style="padding:6px 9px;font-size:12px" value="${r.due||''}" onchange="_poInvoiceRows[${i}].due=this.value"></div>
+    <div class="ibr-field"><label>Status</label><select style="padding:6px 9px;font-size:12px" onchange="_poInvoiceRows[${i}].status=this.value"><option ${r.status==='Pending'?'selected':''}>Pending</option><option ${r.status==='Partially Paid'?'selected':''}>Partially Paid</option><option ${r.status==='Paid'?'selected':''}>Paid</option><option ${r.status==='Disputed'?'selected':''}>Disputed</option></select></div>
+    <div class="ibr-field"><label>Description</label><input style="padding:6px 9px;font-size:12px" value="${r.desc||''}" oninput="_poInvoiceRows[${i}].desc=this.value"></div>
+    <button style="background:none;border:none;cursor:pointer;color:var(--gray-400);font-size:16px;padding:4px 6px;border-radius:4px;align-self:flex-end" onclick="removePOInvoiceRow(${i})" title="Remove">✕</button>
+  </div>`).join('');
+}
+
+// ═══════════════════════════════════════════════════════
+// GRANTS PAGE
+// ═══════════════════════════════════════════════════════
+function renderGrants(search){
+  const piSel=document.getElementById('grantPIFilter');
+  if(piSel&&piSel.options.length<=1)state.pis.forEach(p=>{const o=document.createElement('option');o.value=p.id;o.textContent=`${p.first} ${p.last}`;piSel.appendChild(o);});
+  const q=(search||document.getElementById('grantSearch')?.value||'').toLowerCase();
+  const piF=document.getElementById('grantPIFilter')?.value,stF=document.getElementById('grantStatusFilter')?.value;
+  let filtered=visibleGrants().filter(g=>{
+    if(q&&!g.title.toLowerCase().includes(q)&&!g.grantId.toLowerCase().includes(q))return false;
+    if(piF&&String(g.piId)!==String(piF))return false;
+    if(stF&&g.status!==stF)return false;
+    return true;
+  });
+  if(!filtered.length){document.getElementById('grantGrid').innerHTML=`<div class="empty-state" style="grid-column:1/-1"><div class="icon">◎</div><p>No grants found.</p></div>`;return;}
+  document.getElementById('grantGrid').innerHTML=filtered.map(g=>{
+    const spent=grantSpent(g.id),enc=grantEncumbered(g.id),avail=grantAvailable(g.id,'all'),totB=grantTotalBudget(g);
+    const pct=Math.max(0,Math.min(100,((spent+enc)/(totB||1))*100));
+    const cls=pct<60?'fill-green':pct<85?'fill-amber':'fill-red';
+    return`<div class="grant-card" onclick="navigate('grant-detail',${g.id})">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px"><div><h3>${g.title}</h3><div class="pi">${piName(g.piId)} · ${g.sponsor}</div></div>${badge(g.status)}</div>
+      <div class="grant-id">${g.grantId} · ${fmtDate(g.start)} – ${fmtDate(g.end)} · ${grantYears(g).length} yr(s)</div>
+      <div class="progress-bar" style="margin-bottom:9px"><div class="progress-fill ${cls}" style="width:${pct}%"></div></div>
+      <div class="grant-balance-row"><span>Total Budget</span><span class="amt">${fmt(totB)}</span></div>
+      <div class="grant-balance-row"><span>Spent</span><span class="amt">${fmt(spent)}</span></div>
+      <div class="grant-balance-row"><span>Encumbered</span><span class="amt">${fmt(enc)}</span></div>
+      <div class="grant-balance-row"><span>Available</span><span class="amt ${avail<0?'red':'green'}">${fmt(avail)}</span></div>
+    </div>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════════════════════════
+// GRANT DETAIL
+// ═══════════════════════════════════════════════════════
+function renderGrantDetail(){
+  const g=grantById(state.currentGrantId);if(!g.id)return;
+  const years=grantYears(g);
+  if(!state.currentGrantYear)state.currentGrantYear='all';
+  const yl=state.currentGrantYear;
+  const spent=grantSpent(g.id,yl),enc=grantEncumbered(g.id,yl),avail=grantAvailable(g.id,yl),budg=grantYearBudget(g,yl);
+
+  document.getElementById('grantDetailHeading').innerHTML=`
+    <div>
+      <div style="font-size:12px;color:var(--gray-400);margin-bottom:3px;font-family:'DM Mono',monospace">${g.grantId} · ${g.sponsor}</div>
+      <h2>${g.title}</h2>
+      <div class="meta">PI: ${piName(g.piId)} · ${fmtDate(g.start)} – ${fmtDate(g.end)} · ${years.length} grant year(s)</div>
+    </div>
+    <div style="display:flex;gap:8px;align-items:center">${badge(g.status)}
+      <button class="btn btn-secondary btn-sm" onclick="openEditRecord('grant',${g.id})">Edit Grant</button>
+    </div>`;
+
+  document.getElementById('grantDetailYearSection').innerHTML=`
+    <div style="margin-bottom:14px">
+      <div style="font-size:10px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;color:var(--gray-400);margin-bottom:7px">Filter by Grant Year</div>
+      <div class="year-tabs">
+        <div class="year-tab ${yl==='all'?'active':''}" onclick="setGrantYear('all')">All Years</div>
+        ${years.map(y=>`<div class="year-tab ${yl===y.label?'active':''}" onclick="setGrantYear('${y.label}')">${y.label}</div>`).join('')}
+      </div>
+    </div>
+    <div class="balance-block" style="margin-bottom:18px">
+      <div style="font-size:10px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--gray-400);margin-bottom:10px">Financial Summary — ${yl==='all'?'All Years':yl}</div>
+      <div class="balance-row"><span class="lbl">Budget</span><span class="amt">${fmt(budg)}</span></div>
+      <div class="balance-row"><span class="lbl">Paid Invoices</span><span class="amt" style="color:var(--gray-600)">− ${fmt(spent)}</span></div>
+      <div class="balance-row"><span class="lbl">Encumbered (Open POs)</span><span class="amt" style="color:var(--amber)">− ${fmt(enc)}</span></div>
+      <div class="balance-row total"><span class="lbl">Available Balance</span><span class="amt" style="color:${avail<0?'var(--red)':'var(--green)'}">${fmt(avail)}</span></div>
+    </div>`;
+  grantTab(state.currentGrantTab);
+}
+
+function setGrantYear(yl){
+  state.currentGrantYear=yl;renderGrantDetail();
+  const ti=['overview','procurement','reqs','pos','invs','users'].indexOf(state.currentGrantTab);
+  const tabs=document.querySelectorAll('#grantDetailTabs .tab');
+  tabs.forEach(t=>t.classList.remove('active'));
+  if(tabs[ti])tabs[ti].classList.add('active');
+}
+
+function grantTab(tab,el){
+  state.currentGrantTab=tab;
+  document.querySelectorAll('#grantDetailTabs .tab').forEach(t=>t.classList.remove('active'));
+  if(el)el.classList.add('active');
+  else{const idx=['overview','procurement','reqs','pos','invs','users'].indexOf(tab);const tabs=document.querySelectorAll('#grantDetailTabs .tab');if(tabs[idx])tabs[idx].classList.add('active');}
+  const gid=state.currentGrantId,yl=state.currentGrantYear||'all',ct=document.getElementById('grantDetailTab');
+  if(tab==='overview'){
+    const g=grantById(gid),years=grantYears(g);
+    ct.innerHTML=`<div class="year-budget-grid">${years.map(y=>{
+      const ysp=grantSpent(gid,y.label),yenc=grantEncumbered(gid,y.label),yav=Number(y.budget||0)-ysp-yenc,pct=Math.max(0,Math.min(100,((ysp+yenc)/(Number(y.budget||1)))*100));
+      const cls=pct<60?'fill-green':pct<85?'fill-amber':'fill-red';
+      return`<div class="year-card"><div class="yc-head"><span class="yc-year">${y.label}</span>${badge(yav<0?'Over Budget':'On Track',yav<0?'badge-red':'badge-green')}</div>
+        <div class="progress-bar" style="margin-bottom:8px"><div class="progress-fill ${cls}" style="width:${pct}%"></div></div>
+        <div class="yc-row"><span>Budget</span><span class="yc-val">${fmt(y.budget)}</span></div>
+        <div class="yc-row"><span>Spent</span><span class="yc-val">${fmt(ysp)}</span></div>
+        <div class="yc-row"><span>Encumbered</span><span class="yc-val">${fmt(yenc)}</span></div>
+        <div class="yc-avail"><span>Available</span><span style="font-family:'DM Mono',monospace;color:${yav<0?'var(--red)':'var(--green)'}">${fmt(yav)}</span></div>
+        <div style="font-size:11px;color:var(--gray-400);margin-top:5px">${fmtDate(y.start)} – ${fmtDate(y.end)}</div>
+      </div>`;
+    }).join('')}</div>`;
+  } else if(tab==='procurement'){
+    const rows=state.orders.filter(o=>o.grantId===gid&&(yl==='all'||o.grantYear===yl));
+    ct.innerHTML=procChainTableHTML(rows);
+  } else if(tab==='reqs'){
+    const r=state.requisitions.filter(x=>x.grantId===gid&&(yl==='all'||x.grantYear===yl));ct.innerHTML=r.length?`<div class="table-wrap">${reqsTableHTML(r)}</div>`:empty('No requisitions.');
+  } else if(tab==='pos'){
+    const r=state.pos.filter(x=>x.grantId===gid&&(yl==='all'||x.grantYear===yl));ct.innerHTML=r.length?`<div class="table-wrap">${posTableHTML(r)}</div>`:empty('No purchase orders.');
+  } else if(tab==='invs'){
+    const r=state.invoices.filter(x=>x.grantId===gid&&(yl==='all'||x.grantYear===yl));ct.innerHTML=r.length?`<div class="table-wrap">${invoicesTableHTML(r)}</div>`:empty('No invoices.');
+  } else if(tab==='users'){
+    const r=state.users.filter(u=>(u.grantIds||[]).includes(gid)&&u.status!=='pending');
+    ct.innerHTML=r.length?`<div class="table-wrap"><table><thead><tr><th>Name</th><th>Email</th><th>Role</th></tr></thead><tbody>${r.map(u=>`<tr><td>${u.first} ${u.last}</td><td>${u.email}</td><td>${badge(u.role)}</td></tr>`).join('')}</tbody></table></div>`:empty('No users assigned.');
+  }
+}
+const empty=msg=>`<div class="empty-state"><div class="icon">◌</div><p>${msg}</p></div>`;
+
+// ═══════════════════════════════════════════════════════
+// TABLE HTML
+// ═══════════════════════════════════════════════════════
+function reqsTableHTML(rows){
+  return`<table><thead><tr><th>Req #</th><th>Grant</th><th>Year</th><th>Description</th><th>Vendor</th><th>Amount</th><th>Status</th><th>Linked PO</th><th>Attach</th><th></th></tr></thead>
+  <tbody>${rows.map(r=>{
+    const linkedPO=r.linkedPoId?state.pos.find(p=>p.id===r.linkedPoId):null;
+    const isAuto=r.notes&&r.notes.startsWith('Auto-created');
+    return`<tr>
+      <td class="mono">${r.reqNumber||'—'}${isAuto?` <span class="badge badge-teal" style="font-size:9px;padding:2px 6px;vertical-align:middle">Auto</span>`:''}</td>
+      <td><span class="mono" style="font-size:11px">${grantById(r.grantId).grantId||'—'}</span></td>
+      <td style="font-size:11px;color:var(--gray-400)">${r.grantYear||'—'}</td>
+      <td>${r.desc}</td><td style="color:var(--gray-400)">${r.vendor}</td>
+      <td class="mono">${fmt(r.amount)}</td>
+      <td>${badge(r.status)}</td>
+      <td>${linkedPO?`<span class="mono" style="font-size:11px;color:var(--accent)">${linkedPO.number}</span>`:`<button class="action-btn link" onclick="openEnterPOOnReq(${r.id})" title="Enter PO">+ PO</button>`}</td>
+      <td>${attachBadge(r.attachments)}</td>
+      <td style="white-space:nowrap"><button class="action-btn edit" onclick="openEditRecord('req',${r.id})">✎</button><button class="action-btn del" onclick="deleteRecord('requisitions',${r.id})">✕</button></td>
+    </tr>`;
+  }).join('')}</tbody></table>`;
+}
+
+function posTableHTML(rows){
+  return`<table><thead><tr><th>PO #</th><th>Grant</th><th>Year</th><th>Description</th><th>Vendor</th><th>PO Amt</th><th>Enc.</th><th>Status</th><th>Invoices</th><th>Attach</th><th></th></tr></thead>
+  <tbody>${rows.map(p=>{
+    const invs=getLinkedInvoices(p);
+    // Show Auto badge if PO number matches auto-generation pattern (PO-YYYY-NNNN)
+    const isAuto=/^PO-\d{4}-\d{4}$/.test(p.number);
+    return`<tr>
+      <td class="mono" style="font-size:11px">${p.number}${isAuto?` <span class="badge badge-teal" style="font-size:9px;padding:2px 6px;vertical-align:middle">Auto</span>`:''}</td>
+      <td><span class="mono" style="font-size:11px">${grantById(p.grantId).grantId||'—'}</span></td>
+      <td style="font-size:11px;color:var(--gray-400)">${p.grantYear||'—'}</td>
+      <td>${p.desc}</td><td style="color:var(--gray-400)">${p.vendor}</td>
+      <td class="mono">${fmt(p.amount)}</td>
+      <td class="mono" style="color:var(--amber)">${fmt(p.enc)}</td>
+      <td>${badge(p.status)}</td>
+      <td><div style="display:flex;align-items:center;gap:4px">
+        ${invs.length?`<span class="attach-count">🧾 ${invs.length}</span>`:''}
+        <button class="action-btn link" onclick="openEnterInvoiceOnPO(${p.id})" title="Add Invoice">+ Inv</button>
+      </div></td>
+      <td>${attachBadge(p.attachments)}</td>
+      <td style="white-space:nowrap"><button class="action-btn edit" onclick="openEditRecord('po',${p.id})">✎</button><button class="action-btn del" onclick="deleteRecord('pos',${p.id})">✕</button></td>
+    </tr>`;
+  }).join('')}</tbody></table>`;
+}
+
+function invoicesTableHTML(rows){
+  return`<table><thead><tr><th>Invoice #</th><th>Grant</th><th>Year</th><th>Vendor</th><th>Linked PO</th><th>Total</th><th>Paid</th><th>Remaining</th><th>Status</th><th>Attach</th><th></th></tr></thead>
+  <tbody id="inv-tbody">${rows.map(i=>{
+    const cs=invComputedStatus(i),paid=invTotalPaid(i),rem=invRemaining(i);
+    const linkedPO=i.linkedPoId?state.pos.find(p=>p.id===i.linkedPoId):null;
+    return`<tr>
+      <td class="mono" style="font-size:11px">${i.num}</td>
+      <td><span class="mono" style="font-size:11px">${grantById(i.grantId).grantId||'—'}</span></td>
+      <td style="font-size:11px;color:var(--gray-400)">${i.grantYear||'—'}</td>
+      <td style="color:var(--gray-400)">${i.vendor}</td>
+      <td style="font-size:11px">${linkedPO?`<span class="mono" style="color:var(--accent)">${linkedPO.number}</span>`:i.po||'—'}</td>
+      <td class="mono">${fmt(i.amount)}</td>
+      <td class="mono" style="color:var(--green)">${fmt(paid)}</td>
+      <td class="mono" style="color:${rem>0?'var(--amber)':'var(--gray-400)'}">${fmt(rem)}</td>
+      <td>${badge(cs)}</td>
+      <td>${attachBadge(i.attachments)}</td>
+      <td style="white-space:nowrap">
+        <button class="action-btn expand" onclick="toggleInvDetail(${i.id},this)">▸ Pmts</button>
+        <button class="action-btn edit" onclick="openEditRecord('invoice',${i.id})">✎</button>
+        <button class="action-btn del" onclick="deleteRecord('invoices',${i.id})">✕</button>
+      </td>
+    </tr>
+    <tr id="inv-detail-${i.id}" style="display:none" class="inv-expand">
+      <td colspan="11"><div style="font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--gray-400);margin-bottom:7px">Payment Installments</div>
+      ${(i.payments||[]).length?`<table style="width:auto;border-collapse:collapse"><thead><tr>
+        <th style="font-size:10px;padding:3px 8px;text-align:left;color:var(--gray-400)">Date</th>
+        <th style="font-size:10px;padding:3px 8px;text-align:left;color:var(--gray-400)">Amount</th>
+        <th style="font-size:10px;padding:3px 8px;text-align:left;color:var(--gray-400)">Note</th>
+        <th style="font-size:10px;padding:3px 8px;text-align:left;color:var(--gray-400)">Status</th>
+      </tr></thead><tbody>${(i.payments||[]).map(p=>`<tr>
+        <td style="padding:3px 8px;font-size:12px">${fmtDate(p.date)}</td>
+        <td style="padding:3px 8px;font-family:'DM Mono',monospace;font-size:12px">${fmt(p.amount)}</td>
+        <td style="padding:3px 8px;font-size:12px;color:var(--gray-600)">${p.note||'—'}</td>
+        <td style="padding:3px 8px">${badge(p.status)}</td>
+      </tr>`).join('')}</tbody></table>`:`<div style="font-size:12px;color:var(--gray-400)">No payments recorded.</div>`}
+      </td>
+    </tr>`;
+  }).join('')}</tbody></table>`;
+}
+
+function toggleInvDetail(id,btn){const row=document.getElementById(`inv-detail-${id}`);if(!row)return;const shown=row.style.display!=='none';row.style.display=shown?'none':'';btn.textContent=shown?'▸ Pmts':'▾ Pmts';}
+function attachBadge(arr){if(!arr||!arr.length)return`<span style="color:var(--gray-400);font-size:11px">—</span>`;return`<span class="attach-count">📎 ${arr.length}</span>`;}
+
+// These delegate to the inline sub-tab renderers (standalone pages removed)
+function renderReqs(search){ renderReqsInline(search); }
+function renderPOs(search){ renderPOsInline(search); }
+function renderInvoices(search){ renderInvoicesInline(search); }
+function renderPIs(){
+  document.getElementById('pisTable').innerHTML=`<table><thead><tr><th>Name</th><th>Email</th><th>Dept</th><th>Title</th><th>Grants</th><th></th></tr></thead>
+  <tbody>${state.pis.map(p=>`<tr><td><strong>${p.first} ${p.last}</strong></td><td style="color:var(--gray-600)">${p.email}</td><td>${p.dept}</td><td style="color:var(--gray-600)">${p.title}</td><td>${state.grants.filter(g=>g.piId===p.id).length}</td>
+  <td><button class="action-btn edit" onclick="openEditRecord('pi',${p.id})">✎</button><button class="action-btn del" onclick="deleteRecord('pis',${p.id})">✕</button></td></tr>`).join('')}</tbody></table>`;
+}
+function renderUsers(search){
+  const q=(search||'').toLowerCase(),rF=document.getElementById('userRoleFilter')?.value;
+  // Only show active/rejected users in the main table; pending are shown in the requests panel
+  let rows=state.users.filter(u=>{
+    if(u.status==='pending') return false;
+    if(q&&!`${u.first} ${u.last}`.toLowerCase().includes(q)&&!u.email.includes(q))return false;
+    if(rF&&u.role!==rF)return false;
+    return true;
+  });
+  const pendingPanel = isAdmin() ? renderAccessRequests() : '';
+  const tableHTML = `<table><thead><tr>
+    <th>Name</th><th>Email</th><th>Role</th><th>Dept</th><th>Status</th><th>Grant Access</th><th></th>
+  </tr></thead>
+  <tbody>${rows.map(u=>`<tr>
+    <td><strong>${u.first} ${u.last}</strong></td>
+    <td style="color:var(--gray-600)">${u.email}</td>
+    <td>${badge(u.role)}</td>
+    <td style="color:var(--gray-600);font-size:12px">${u.dept||'—'}</td>
+    <td>${u.status==='rejected'?badge('Rejected'):badge('Active','badge-green')}</td>
+    <td><div class="chip-row">${(u.grantIds||[]).map(gid=>{const g=grantById(gid);return g.grantId?`<span class="badge badge-blue" style="font-size:10px">${g.grantId}</span>`:''}).join('')}</div></td>
+    <td style="white-space:nowrap">
+      ${isAdmin()?`<button class="action-btn edit" onclick="openEditRecord('user',${u.id})">✎</button>
+      <button class="action-btn del" onclick="deleteRecord('users',${u.id})">✕</button>`:''}
+    </td>
+  </tr>`).join('')}</tbody></table>`;
+  const wrapper = document.getElementById('usersTable');
+  if(wrapper) wrapper.innerHTML = pendingPanel + `<div class="table-wrap">${tableHTML}</div>`;
+  updateNotifDot();
+}
+
+// ═══════════════════════════════════════════════════════
+// FILTER SELECT POPULATION
+// ═══════════════════════════════════════════════════════
+function populateFilterSelects(){
+  ['orderGrantFilter','reqGrantFilter','poGrantFilter','invGrantFilter','efcaGrantFilter','procGrantFilter',
+   'procReqGrantFilter','procPoGrantFilter','procInvGrantFilter'].forEach(id=>{
+    const sel=document.getElementById(id);if(!sel||sel.options.length>1)return;
+    state.grants.forEach(g=>{const o=document.createElement('option');o.value=g.id;o.textContent=g.grantId;sel.appendChild(o);});
+  });
+  const piSel=document.getElementById('grantPIFilter');
+  if(piSel&&piSel.options.length<=1)state.pis.forEach(p=>{const o=document.createElement('option');o.value=p.id;o.textContent=`${p.first} ${p.last}`;piSel.appendChild(o);});
+}
+
+function populateModalSelects(){
+  ['f-order-grant','f-req-grant','f-po-grant','f-inv-grant'].forEach(id=>{
+    const sel=document.getElementById(id);if(!sel)return;sel.innerHTML='';
+    visibleGrants().forEach(g=>{const o=document.createElement('option');o.value=g.id;o.textContent=`${g.grantId} — ${g.title.slice(0,30)}`;sel.appendChild(o);});
+  });
+  const piSel=document.getElementById('f-grant-pi');if(piSel){piSel.innerHTML='';state.pis.forEach(p=>{const o=document.createElement('option');o.value=p.id;o.textContent=`${p.first} ${p.last}`;piSel.appendChild(o);});}
+  ['f-order-user','f-req-user'].forEach(id=>{const sel=document.getElementById(id);if(!sel)return;sel.innerHTML='';state.users.forEach(u=>{const o=document.createElement('option');o.value=u.id;o.textContent=`${u.first} ${u.last}`;sel.appendChild(o);});});
+  const ugSel=document.getElementById('f-user-grants');if(ugSel){ugSel.innerHTML='';state.grants.forEach(g=>{const o=document.createElement('option');o.value=g.id;o.textContent=g.grantId;ugSel.appendChild(o);});}
+}
+
+function syncYearSelect(grantSelId,yearSelId){
+  const gid=Number(document.getElementById(grantSelId)?.value);
+  const ysel=document.getElementById(yearSelId);if(!ysel)return;
+  const g=grantById(gid);ysel.innerHTML='<option value="">— All Years —</option>';
+  grantYears(g).forEach(y=>{const o=document.createElement('option');o.value=y.label;o.textContent=y.label;ysel.appendChild(o);});
+}
+
+// ═══════════════════════════════════════════════════════
+// GRANT YEAR BUDGET BUILDER
+// ═══════════════════════════════════════════════════════
+function buildYearRows(){
+  const start=document.getElementById('f-grant-start').value,end=document.getElementById('f-grant-end').value;
+  if(!start||!end||start>=end){document.getElementById('yearBudgetRows').innerHTML='<div style="font-size:12px;color:var(--gray-400)">Enter valid start and end dates.</div>';return;}
+  const sy=new Date(start),ey=new Date(end);
+  const numYears=Math.ceil((ey-sy)/(365.25*24*3600*1000));
+  const count=Math.max(1,Math.min(numYears,10));
+  const existingYears=state._editingGrantYears||[];
+  let html='';
+  for(let i=0;i<count;i++){
+    const ys=new Date(sy);ys.setFullYear(sy.getFullYear()+i);
+    const ye=new Date(sy);ye.setFullYear(sy.getFullYear()+i+1);ye.setDate(ye.getDate()-1);
+    const yStart=i===0?start:ys.toISOString().split('T')[0];
+    const yEnd=i===count-1?end:ye.toISOString().split('T')[0];
+    const existing=existingYears[i];
+    html+=`<div style="display:grid;grid-template-columns:180px 1fr 1fr 1fr;gap:7px;align-items:end;padding:8px 10px;background:var(--gray-50);border-radius:7px;border:var(--border)">
+      <div style="display:flex;flex-direction:column;gap:3px"><label style="font-size:11px">Year Label</label><input style="font-size:12px;padding:5px 8px" value="${existing?.label||`Year ${i+1}`}" id="yb-label-${i}" oninput="updateYearTotal()"></div>
+      <div style="display:flex;flex-direction:column;gap:3px"><label style="font-size:11px">Start Date</label><input type="date" style="font-size:12px;padding:5px 8px" value="${yStart}" id="yb-start-${i}"></div>
+      <div style="display:flex;flex-direction:column;gap:3px"><label style="font-size:11px">End Date</label><input type="date" style="font-size:12px;padding:5px 8px" value="${yEnd}" id="yb-end-${i}"></div>
+      <div style="display:flex;flex-direction:column;gap:3px"><label style="font-size:11px">Budget ($)</label><input type="number" style="font-size:12px;padding:5px 8px" value="${existing?.budget||''}" id="yb-budget-${i}" placeholder="0.00" oninput="updateYearTotal()"></div>
+    </div>`;
+  }
+  state._yearRowCount=count;
+  document.getElementById('yearBudgetRows').innerHTML=html;
+  updateYearTotal();
+}
+function updateYearTotal(){let t=0;for(let i=0;i<(state._yearRowCount||0);i++){t+=Number(document.getElementById(`yb-budget-${i}`)?.value||0);}document.getElementById('yearBudgetTotal').textContent=fmt(t);}
+function getYearBudgetsFromForm(){const r=[];for(let i=0;i<(state._yearRowCount||0);i++){r.push({label:document.getElementById(`yb-label-${i}`)?.value||`Year ${i+1}`,start:document.getElementById(`yb-start-${i}`)?.value||'',end:document.getElementById(`yb-end-${i}`)?.value||'',budget:Number(document.getElementById(`yb-budget-${i}`)?.value||0)});}return r;}
+
+// ═══════════════════════════════════════════════════════
+// STAGE UI
+// ═══════════════════════════════════════════════════════
+function refreshStageUI(){
+  const e=document.getElementById('stage-check-0')?.checked,p=document.getElementById('stage-check-4')?.checked;
+  const r1=(document.getElementById('stage-ref-1')?.value||'').trim(),r2=(document.getElementById('stage-ref-2')?.value||'').trim(),r3=(document.getElementById('stage-ref-3')?.value||'').trim();
+  const done=[e,e&&r1!=='',e&&r1!==''&&r2!=='',e&&r1!==''&&r2!==''&&r3!=='',p];
+  for(let i=0;i<5;i++){
+    const ind=document.getElementById(`stageInd-${i}`),lbl=document.getElementById(`stageLbl-${i}`),con=document.getElementById(`stageCon-${i}`);
+    if(!ind||!lbl)continue;
+    ind.className='stage-indicator'+(done[i]?' done':'');ind.textContent=done[i]?'✓':(i+1);
+    lbl.className='stage-label'+(done[i]?' done':'');
+    if(con)con.className='stage-connector'+(done[i]?' done':'');
+  }
+}
+function setStageUI(stages){
+  const s=stages||{};
+  const c0=document.getElementById('stage-check-0');if(c0)c0.checked=!!s.efca;
+  const r1=document.getElementById('stage-ref-1');if(r1)r1.value=s.reqRef||'';
+  const r2=document.getElementById('stage-ref-2');if(r2)r2.value=s.poRef||'';
+  const r3=document.getElementById('stage-ref-3');if(r3)r3.value=s.invoiceRef||'';
+  const c4=document.getElementById('stage-check-4');if(c4)c4.checked=!!s.paid;
+  refreshStageUI();
+}
+function getStagesFromUI(){
+  const efca=document.getElementById('stage-check-0')?.checked||false;
+  const reqRef=(document.getElementById('stage-ref-1')?.value||'').trim();
+  const poRef=(document.getElementById('stage-ref-2')?.value||'').trim();
+  const invoiceRef=(document.getElementById('stage-ref-3')?.value||'').trim();
+  const paid=document.getElementById('stage-check-4')?.checked||false;
+  return{efca,req:efca&&reqRef!=='',reqRef,po:efca&&reqRef!==''&&poRef!=='',poRef,invoice:efca&&reqRef!==''&&poRef!==''&&invoiceRef!=='',invoiceRef,paid};
+}
+
+// ═══════════════════════════════════════════════════════
+// ATTACHMENTS
+// ═══════════════════════════════════════════════════════
+function dzDragOver(e,z){e.preventDefault();document.getElementById(z)?.classList.add('drag');}
+function dzDragLeave(z){document.getElementById(z)?.classList.remove('drag');}
+function dzDrop(e,t){e.preventDefault();dzDragLeave(`${t}-drop-zone`);processFiles(Array.from(e.dataTransfer.files),t);}
+function handleFileInput(e,t){processFiles(Array.from(e.target.files),t);e.target.value='';}
+function processFiles(files,type){files.forEach(f=>{const reader=new FileReader();reader.onload=ev=>{state.stagingAttachments[type].push({id:uid(),name:f.name,size:f.size,type:f.type,dataUrl:ev.target.result});renderStagingAttachments(type);};reader.readAsDataURL(f);});}
+function renderStagingAttachments(type){const list=document.getElementById(`${type}-attach-list`);if(!list)return;const atts=state.stagingAttachments[type];list.innerHTML=atts.map((a,i)=>`<div class="attach-item"><span class="ai-icon">${fileIcon(a.name)}</span><span class="ai-name" title="${a.name}">${a.name}</span><span class="ai-size">${fmtSize(a.size)}</span><button class="ai-dl" onclick="downloadAttachment('staging','${type}',${i})">↓</button><button class="ai-del" onclick="removeStagingAttach('${type}',${i})">✕</button></div>`).join('');}
+function renderRecordAttachments(type,listId,attachments){const list=document.getElementById(listId);if(!list)return;if(!attachments||!attachments.length){list.innerHTML='';return;}list.innerHTML=attachments.map((a,i)=>`<div class="attach-item"><span class="ai-icon">${fileIcon(a.name)}</span><span class="ai-name">${a.name}</span><span class="ai-size">${fmtSize(a.size)}</span><button class="ai-dl" onclick="downloadAttachment('record','${type}',${i},${state.editingId||0})">↓</button><button class="ai-del" onclick="removeRecordAttach('${type}',${i},${state.editingId||0})">✕</button></div>`).join('');}
+function downloadAttachment(source,type,idx,recordId){let att=null;if(source==='staging')att=state.stagingAttachments[type][idx];else{const col=type==='req'?state.requisitions:type==='po'?state.pos:state.invoices;const rec=col.find(x=>x.id===recordId);if(rec)att=rec.attachments[idx];}if(!att||!att.dataUrl)return;const a=document.createElement('a');a.href=att.dataUrl;a.download=att.name;a.click();}
+function removeStagingAttach(t,i){state.stagingAttachments[t].splice(i,1);renderStagingAttachments(t);}
+function removeRecordAttach(type,idx,recordId){const col=type==='req'?state.requisitions:type==='po'?state.pos:state.invoices;const rec=col.find(x=>x.id===recordId);if(rec){rec.attachments.splice(idx,1);renderRecordAttachments(type,`${type}-attach-list`,rec.attachments);}}
+
+// ═══════════════════════════════════════════════════════
+// PAYMENT ROWS
+// ═══════════════════════════════════════════════════════
+function addPaymentRow(existing){
+  const p=existing||{id:uid(),amount:'',date:new Date().toISOString().split('T')[0],note:'',status:'Pending'};
+  _payments.push(p);renderPaymentRows();
+}
+function renderPaymentRows(){
+  const c=document.getElementById('paymentRows');if(!c)return;
+  c.innerHTML=_payments.map((p,i)=>`<div class="payment-row">
+    <div class="pr-field"><label>Amount ($)</label><input type="number" placeholder="0.00" value="${p.amount}" style="padding:6px 9px;font-size:13px" oninput="_payments[${i}].amount=Number(this.value);updateInvSummary()"></div>
+    <div class="pr-field"><label>Date</label><input type="date" value="${p.date}" style="padding:6px 9px;font-size:13px" onchange="_payments[${i}].date=this.value"></div>
+    <div class="pr-field"><label>Status</label><select style="padding:6px 9px;font-size:13px" onchange="_payments[${i}].status=this.value"><option ${p.status==='Pending'?'selected':''}>Pending</option><option ${p.status==='Paid'?'selected':''}>Paid</option><option ${p.status==='Disputed'?'selected':''}>Disputed</option></select></div>
+    <div class="pr-field"><label>Note</label><input type="text" value="${p.note||''}" style="padding:6px 9px;font-size:13px" oninput="_payments[${i}].note=this.value"></div>
+    <button class="pr-del" onclick="removePayment(${i})">✕</button>
+  </div>`).join('');
+  updateInvSummary();
+}
+function removePayment(i){_payments.splice(i,1);renderPaymentRows();}
+function updateInvSummary(){
+  const total=Number(document.getElementById('f-inv-amount')?.value||0);
+  const paid=_payments.filter(p=>p.status==='Paid').reduce((s,p)=>s+Number(p.amount||0),0);
+  const rem=total-paid;
+  const ts=document.getElementById('is-total'),ps=document.getElementById('is-paid'),rs=document.getElementById('is-remaining');
+  if(ts)ts.textContent=fmt(total);if(ps)ps.textContent=fmt(paid);
+  if(rs){rs.textContent=fmt(rem);rs.style.color=rem>0?'var(--amber)':rem<0?'var(--red)':'var(--green)';}
+}
+
+// ═══════════════════════════════════════════════════════
+// OPEN MODALS
+// ═══════════════════════════════════════════════════════
+function openNewModal(id){
+  state.editingId=null;
+  populateModalSelects();
+  const today=new Date().toISOString().split('T')[0];
+  const dm={'modal-order':'f-order-date','modal-req':'f-req-date','modal-po':'f-po-date','modal-invoice':'f-inv-date'};
+  if(dm[id])document.getElementById(dm[id]).value=today;
+  if(state.currentGrantId){
+    const gm={'modal-order':'f-order-grant','modal-req':'f-req-grant','modal-po':'f-po-grant','modal-invoice':'f-inv-grant'};
+    if(gm[id]){const sel=document.getElementById(gm[id]);if(sel){sel.value=state.currentGrantId;syncYearSelect(gm[id],gm[id].replace('grant','year'));}}
+  }
+  ['req','po','inv'].forEach(t=>{state.stagingAttachments[t]=[];});
+  ['req-attach-list','po-attach-list','inv-attach-list'].forEach(l=>{const el=document.getElementById(l);if(el)el.innerHTML='';});
+
+  if(id==='modal-grant'){document.getElementById('grantModalTitle').textContent='New Grant';state._editingGrantYears=[];document.getElementById('yearBudgetRows').innerHTML='<div style="font-size:12px;color:var(--gray-400)">Enter dates above.</div>';document.getElementById('yearBudgetTotal').textContent='$0.00';['f-grant-title','f-grant-id','f-grant-sponsor','f-grant-notes'].forEach(i=>{const el=document.getElementById(i);if(el)el.value='';});}
+  if(id==='modal-order'){document.getElementById('orderModalTitle').textContent='New EFCA Request';setStageUI({});['f-order-desc','f-order-vendor','f-order-amount','f-order-just','f-order-category','f-order-efca-ref'].forEach(i=>{const el=document.getElementById(i);if(el)el.value='';});const efcaSel=document.getElementById('f-order-efca');if(efcaSel)efcaSel.value='Pending EFCA';}
+  if(id==='modal-req'){document.getElementById('reqModalTitle').textContent='New Requisition';['f-req-number-input','f-req-desc','f-req-vendor','f-req-amount','f-req-notes','f-req-efca-ref','f-req-po-number','f-req-po-amount'].forEach(i=>{const el=document.getElementById(i);if(el)el.value='';});const ps=document.getElementById('f-req-po-status');if(ps)ps.value='';}
+  if(id==='modal-po'){document.getElementById('poModalTitle').textContent='New Purchase Order';_poInvoiceRows=[];renderPOInvoiceBuilder();['f-po-number','f-po-desc','f-po-vendor','f-po-amount','f-po-enc','f-po-req'].forEach(i=>{const el=document.getElementById(i);if(el)el.value='';});}
+  if(id==='modal-invoice'){document.getElementById('invModalTitle').textContent='New Invoice';_payments=[];renderPaymentRows();updateInvSummary();['f-inv-num','f-inv-vendor','f-inv-po','f-inv-amount','f-inv-due','f-inv-desc'].forEach(i=>{const el=document.getElementById(i);if(el)el.value='';});}
+  document.getElementById(id).classList.add('open');
+}
+
+function openEditRecord(type,id){
+  state.editingId=id;
+  populateModalSelects();
+  if(type==='grant'){
+    const g=grantById(id);if(!g.id)return;
+    document.getElementById('grantModalTitle').textContent='Edit Grant';
+    state._editingGrantYears=grantYears(g);
+    setTimeout(()=>{
+      document.getElementById('f-grant-title').value=g.title;document.getElementById('f-grant-id').value=g.grantId;
+      document.getElementById('f-grant-sponsor').value=g.sponsor;document.getElementById('f-grant-pi').value=g.piId;
+      document.getElementById('f-grant-status').value=g.status;document.getElementById('f-grant-start').value=g.start;
+      document.getElementById('f-grant-end').value=g.end;document.getElementById('f-grant-notes').value=g.notes||'';
+      buildYearRows();
+    },30);
+    document.getElementById('modal-grant').classList.add('open');
+  } else if(type==='order'){
+    const o=state.orders.find(x=>x.id===id);if(!o)return;
+    document.getElementById('orderModalTitle').textContent='Edit EFCA / Order';
+    document.getElementById('f-order-grant').value=o.grantId;syncYearSelect('f-order-grant','f-order-year');
+    setTimeout(()=>{
+      document.getElementById('f-order-year').value=o.grantYear||'';
+      document.getElementById('f-order-user').value=o.userId;document.getElementById('f-order-desc').value=o.desc;
+      document.getElementById('f-order-vendor').value=o.vendor;document.getElementById('f-order-amount').value=o.amount;
+      document.getElementById('f-order-date').value=o.date;document.getElementById('f-order-category').value=o.category||'';
+      document.getElementById('f-order-just').value=o.just||'';
+      document.getElementById('f-order-efca').value=o.efcaStatus||'Pending EFCA';
+      document.getElementById('f-order-efca-ref').value=o.efcaRef||'';
+      setStageUI(o.stages);
+    },30);
+    document.getElementById('modal-order').classList.add('open');
+  } else if(type==='req'){
+    const r=state.requisitions.find(x=>x.id===id);if(!r)return;
+    document.getElementById('reqModalTitle').textContent='Edit Requisition';
+    document.getElementById('f-req-grant').value=r.grantId;syncYearSelect('f-req-grant','f-req-year');
+    setTimeout(()=>{
+      document.getElementById('f-req-year').value=r.grantYear||'';document.getElementById('f-req-user').value=r.userId;
+      document.getElementById('f-req-number-input').value=r.reqNumber||'';
+      document.getElementById('f-req-desc').value=r.desc;document.getElementById('f-req-vendor').value=r.vendor;
+      document.getElementById('f-req-amount').value=r.amount;document.getElementById('f-req-status').value=r.status;
+      document.getElementById('f-req-date').value=r.date;document.getElementById('f-req-notes').value=r.notes||'';
+      document.getElementById('f-req-efca-ref').value=r.efcaRef||'';
+      const existingPO=r.linkedPoId?state.pos.find(p=>p.id===r.linkedPoId):null;
+      if(existingPO){document.getElementById('f-req-po-number').value=existingPO.number;document.getElementById('f-req-po-date').value=existingPO.date;document.getElementById('f-req-po-amount').value=existingPO.amount;document.getElementById('f-req-po-status').value=existingPO.status;}
+      else{['f-req-po-number','f-req-po-amount'].forEach(i=>{const el=document.getElementById(i);if(el)el.value='';});const ps=document.getElementById('f-req-po-status');if(ps)ps.value='';}
+    },30);
+    state.stagingAttachments.req=[];renderRecordAttachments('req','req-attach-list',r.attachments||[]);
+    document.getElementById('modal-req').classList.add('open');
+  } else if(type==='po'){
+    const p=state.pos.find(x=>x.id===id);if(!p)return;
+    document.getElementById('poModalTitle').textContent='Edit Purchase Order';
+    document.getElementById('f-po-grant').value=p.grantId;syncYearSelect('f-po-grant','f-po-year');
+    const existingInvs=getLinkedInvoices(p);
+    _poInvoiceRows=existingInvs.map(i=>({id:i.id,existing:true,num:i.num,amount:i.amount,date:i.date,due:i.due||'',desc:i.desc||'',status:i.status}));
+    setTimeout(()=>{
+      document.getElementById('f-po-year').value=p.grantYear||'';document.getElementById('f-po-number').value=p.number;
+      document.getElementById('f-po-desc').value=p.desc;document.getElementById('f-po-vendor').value=p.vendor;
+      document.getElementById('f-po-amount').value=p.amount;document.getElementById('f-po-enc').value=p.enc;
+      document.getElementById('f-po-status').value=p.status;document.getElementById('f-po-date').value=p.date;
+      document.getElementById('f-po-req').value=p.req||'';renderPOInvoiceBuilder();
+    },30);
+    state.stagingAttachments.po=[];renderRecordAttachments('po','po-attach-list',p.attachments||[]);
+    document.getElementById('modal-po').classList.add('open');
+  } else if(type==='invoice'){
+    const i=state.invoices.find(x=>x.id===id);if(!i)return;
+    document.getElementById('invModalTitle').textContent='Edit Invoice';
+    document.getElementById('f-inv-grant').value=i.grantId;syncYearSelect('f-inv-grant','f-inv-year');
+    setTimeout(()=>{
+      document.getElementById('f-inv-year').value=i.grantYear||'';document.getElementById('f-inv-num').value=i.num;
+      document.getElementById('f-inv-vendor').value=i.vendor;document.getElementById('f-inv-po').value=i.po||'';
+      document.getElementById('f-inv-amount').value=i.amount;document.getElementById('f-inv-status').value=i.status||'Pending';
+      document.getElementById('f-inv-date').value=i.date;document.getElementById('f-inv-due').value=i.due||'';
+      document.getElementById('f-inv-desc').value=i.desc||'';
+    },30);
+    _payments=(i.payments||[]).map(p=>({...p}));renderPaymentRows();updateInvSummary();
+    state.stagingAttachments.inv=[];renderRecordAttachments('inv','inv-attach-list',i.attachments||[]);
+    document.getElementById('modal-invoice').classList.add('open');
+  } else if(type==='pi'){
+    const p=state.pis.find(x=>x.id===id);if(!p)return;
+    document.getElementById('piModalTitle').textContent='Edit PI';
+    document.getElementById('f-pi-first').value=p.first;document.getElementById('f-pi-last').value=p.last;
+    document.getElementById('f-pi-email').value=p.email;document.getElementById('f-pi-dept').value=p.dept;document.getElementById('f-pi-title').value=p.title;
+    document.getElementById('modal-pi').classList.add('open');
+  } else if(type==='user'){
+    const u=state.users.find(x=>x.id===id);if(!u)return;
+    document.getElementById('userModalTitle').textContent='Edit User';
+    document.getElementById('f-user-first').value=u.first;document.getElementById('f-user-last').value=u.last;
+    document.getElementById('f-user-email').value=u.email;document.getElementById('f-user-role').value=u.role;
+    const gSel=document.getElementById('f-user-grants');setTimeout(()=>{Array.from(gSel.options).forEach(o=>{o.selected=u.grantIds.includes(Number(o.value));});},30);
+    document.getElementById('modal-user').classList.add('open');
+  }
+}
+
+function closeModal(id){document.getElementById(id).classList.remove('open');}
+
+// ═══════════════════════════════════════════════════════
+// SAVE FUNCTIONS
+// ═══════════════════════════════════════════════════════
+function saveGrant(){
+  const title=document.getElementById('f-grant-title').value.trim(),gId=document.getElementById('f-grant-id').value.trim();
+  if(!title||!gId){toast('Title and Grant ID required.');return;}
+  const data={title,grantId:gId,sponsor:document.getElementById('f-grant-sponsor').value.trim(),piId:Number(document.getElementById('f-grant-pi').value),
+    status:document.getElementById('f-grant-status').value,start:document.getElementById('f-grant-start').value,end:document.getElementById('f-grant-end').value,
+    notes:document.getElementById('f-grant-notes').value,yearBudgets:getYearBudgetsFromForm()};
+  if(state.editingId){Object.assign(state.grants.find(x=>x.id===state.editingId),data);toast('Grant updated.');}
+  else{state.grants.push({id:uid(),...data});toast('Grant added.');}
+  closeModal('modal-grant');state._editingGrantYears=[];
+  if(state.currentPage==='grants')renderGrants();else if(state.currentPage==='grant-detail')renderGrantDetail();else renderDashboard();
+}
+
+// ─────────────────────────────────────────────────────────
+// AUTO-CASCADE HELPERS
+// When a record transitions to an "approved" status, the
+// next record in the chain is created automatically.
+// ─────────────────────────────────────────────────────────
+
+/** Auto-create a Requisition when EFCA is approved, if one doesn't exist yet. */
+function autoCascadeEFCAToReq(order){
+  if(order.efcaStatus!=='EFCA Approved') return null;
+  // Already has a linked requisition?
+  const existing=state.requisitions.find(r=>r.linkedOrderId===order.id);
+  if(existing) return null;
+  const today=new Date().toISOString().split('T')[0];
+  const newId=uid();
+  const req={
+    id:newId, reqNumber:`REQ-${newId}`,
+    grantId:order.grantId, grantYear:order.grantYear,
+    userId:order.userId,
+    desc:order.desc, vendor:order.vendor, amount:order.amount,
+    status:'Submitted',   // starts as Submitted — ready for approval
+    date:today,
+    notes:`Auto-created from EFCA approval ${order.efcaRef||order.id}.`,
+    efcaRef:order.efcaRef||'',
+    linkedOrderId:order.id, linkedPoId:null,
+    attachments:[]
+  };
+  state.requisitions.push(req);
+  // Update order stage
+  order.stages=order.stages||{};
+  order.stages.efca=true;
+  order.stages.req=true;
+  order.stages.reqRef=req.reqNumber;
+  return req;
+}
+
+/** Auto-create a PO when a Requisition is Approved, if one doesn't exist yet. */
+function autoCascadeReqToPO(req){
+  if(req.status!=='Approved') return null;
+  const existing=state.pos.find(p=>p.linkedReqId===req.id);
+  if(existing) return null;
+  const today=new Date().toISOString().split('T')[0];
+  const newId=uid();
+  const poNumber=`PO-${today.slice(0,4)}-${String(newId).padStart(4,'0')}`;
+  const po={
+    id:newId,
+    grantId:req.grantId, grantYear:req.grantYear,
+    number:poNumber,
+    desc:req.desc, vendor:req.vendor,
+    amount:req.amount, enc:req.amount,   // full amount encumbered by default
+    status:'Open',
+    date:today,
+    req:req.reqNumber,
+    linkedReqId:req.id, linkedOrderId:req.linkedOrderId,
+    attachments:[]
+  };
+  state.pos.push(po);
+  // Update linked order stage
+  req.linkedPoId=newId;
+  if(req.linkedOrderId){
+    const ord=state.orders.find(x=>x.id===req.linkedOrderId);
+    if(ord){ord.stages=ord.stages||{};ord.stages.po=true;ord.stages.poRef=poNumber;}
+  }
+  return po;
+}
+
+/** Auto-create a draft Invoice when a PO is set to Open/approved, if none exist yet. */
+function autoCascadePOToInvoice(po){
+  if(!['Open','Partially Received'].includes(po.status)) return null;
+  const existing=state.invoices.find(i=>i.linkedPoId===po.id);
+  if(existing) return null;
+  const today=new Date().toISOString().split('T')[0];
+  const newId=uid();
+  // Default due date 30 days out
+  const dueDate=new Date();dueDate.setDate(dueDate.getDate()+30);
+  const dueDateStr=dueDate.toISOString().split('T')[0];
+  const inv={
+    id:newId,
+    grantId:po.grantId, grantYear:po.grantYear,
+    num:`INV-${today.slice(0,4)}-${String(newId).padStart(4,'0')}`,
+    vendor:po.vendor,
+    po:po.number, linkedPoId:po.id, linkedOrderId:po.linkedOrderId,
+    amount:po.amount,
+    status:'Pending',
+    date:today, due:dueDateStr,
+    desc:po.desc,
+    attachments:[], payments:[]
+  };
+  state.invoices.push(inv);
+  // Update linked order stage
+  if(po.linkedOrderId){
+    const ord=state.orders.find(x=>x.id===po.linkedOrderId);
+    if(ord){ord.stages=ord.stages||{};ord.stages.invoice=true;ord.stages.invoiceRef=inv.num;}
+  }
+  return inv;
+}
+
+/** Show a multi-line cascade notification */
+function toastCascade(messages){
+  const t=document.getElementById('toast');
+  t.innerHTML=messages.map(m=>`<div style="display:flex;align-items:center;gap:8px"><span style="color:#6eb3f5">→</span><span>${m}</span></div>`).join('');
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), messages.length>1?4000:2600);
+}
+
+// ─────────────────────────────────────────────────────────
+
+function saveOrder(){
+  const desc=document.getElementById('f-order-desc').value.trim();if(!desc){toast('Description required.');return;}
+  const newEfcaStatus=document.getElementById('f-order-efca').value;
+  const data={
+    grantId:Number(document.getElementById('f-order-grant').value),
+    grantYear:document.getElementById('f-order-year').value||null,
+    userId:Number(document.getElementById('f-order-user').value),
+    desc,vendor:document.getElementById('f-order-vendor').value.trim(),
+    amount:Number(document.getElementById('f-order-amount').value)||0,
+    date:document.getElementById('f-order-date').value,
+    category:document.getElementById('f-order-category').value.trim(),
+    just:document.getElementById('f-order-just').value,
+    efcaStatus:newEfcaStatus,
+    efcaRef:document.getElementById('f-order-efca-ref').value.trim(),
+    stages:getStagesFromUI()
+  };
+  // Ensure EFCA stage flag is consistent with status
+  if(data.efcaStatus==='EFCA Approved') data.stages.efca=true;
+
+  let orderRecord;
+  const wasApproved = state.editingId
+    ? state.orders.find(x=>x.id===state.editingId)?.efcaStatus==='EFCA Approved'
+    : false;
+
+  if(state.editingId){
+    orderRecord=state.orders.find(x=>x.id===state.editingId);
+    Object.assign(orderRecord,data);
+  } else {
+    orderRecord={id:uid(),...data};
+    state.orders.push(orderRecord);
+  }
+
+  // Auto-cascade: if EFCA just became Approved, create REQ
+  const msgs=[state.editingId?'EFCA/Order updated.':'EFCA request saved.'];
+  if(data.efcaStatus==='EFCA Approved'&&!wasApproved){
+    const newReq=autoCascadeEFCAToReq(orderRecord);
+    if(newReq){
+      msgs.push(`Requisition ${newReq.reqNumber} auto-created (Submitted).`);
+      // Check if the REQ should cascade further (it starts as Submitted, not Approved, so no auto-PO yet)
+    }
+  }
+
+  closeModal('modal-order');
+  toastCascade(msgs);
+  refreshViews('orders');
+}
+
+function saveReq(){
+  const desc=document.getElementById('f-req-desc').value.trim();if(!desc){toast('Description required.');return;}
+  let existingAtts=[];
+  if(state.editingId){const r=state.requisitions.find(x=>x.id===state.editingId);existingAtts=r?.attachments||[];}
+  const attachments=[...existingAtts,...state.stagingAttachments.req];
+
+  const linkedOrderIdFromDataset=Number(document.getElementById('f-req-grant').dataset.linkedOrderId||0)||null;
+  const newStatus=document.getElementById('f-req-status').value;
+  const grantId=Number(document.getElementById('f-req-grant').value);
+  const grantYear=document.getElementById('f-req-year').value||null;
+  const vendor=document.getElementById('f-req-vendor').value.trim();
+  const amount=Number(document.getElementById('f-req-amount').value)||0;
+  // Read the user-entered official requisition number (may be empty)
+  const officialReqNumber=(document.getElementById('f-req-number-input')?.value||'').trim();
+
+  const reqData={
+    grantId, grantYear,
+    userId:Number(document.getElementById('f-req-user').value),
+    desc, vendor, amount,
+    status:newStatus,
+    date:document.getElementById('f-req-date').value,
+    notes:document.getElementById('f-req-notes').value,
+    efcaRef:document.getElementById('f-req-efca-ref').value.trim(),
+    attachments
+  };
+
+  let reqRecord;
+  const wasApproved=state.editingId
+    ? state.requisitions.find(x=>x.id===state.editingId)?.status==='Approved'
+    : false;
+
+  if(state.editingId){
+    reqRecord=state.requisitions.find(x=>x.id===state.editingId);
+    const oldReqNumber=reqRecord.reqNumber;
+    // Update official req number if the user provided one
+    if(officialReqNumber) reqRecord.reqNumber=officialReqNumber;
+    Object.assign(reqRecord,reqData);
+    // If req number changed, sync it on the linked order stage ref
+    if(officialReqNumber&&officialReqNumber!==oldReqNumber&&reqRecord.linkedOrderId){
+      const ord=state.orders.find(x=>x.id===reqRecord.linkedOrderId);
+      if(ord&&ord.stages) ord.stages.reqRef=officialReqNumber;
+    }
+  } else {
+    const newId=uid();
+    // Use the official number if provided; otherwise fall back to system-generated REQ-{id}
+    const assignedReqNumber=officialReqNumber||`REQ-${newId}`;
+    reqRecord={id:newId,reqNumber:assignedReqNumber,linkedOrderId:linkedOrderIdFromDataset,...reqData,linkedPoId:null};
+    state.requisitions.push(reqRecord);
+    // Back-link to the parent order's stage
+    if(linkedOrderIdFromDataset){
+      const ord=state.orders.find(x=>x.id===linkedOrderIdFromDataset);
+      if(ord){ord.stages=ord.stages||{};ord.stages.req=true;ord.stages.reqRef=reqRecord.reqNumber;ord.stages.efca=true;ord.efcaStatus='EFCA Approved';}
+    }
+  }
+
+  const msgs=[state.editingId?'Requisition updated.':'Requisition created.'];
+
+  // Auto-cascade: if REQ just became Approved, create PO
+  if(newStatus==='Approved'&&!wasApproved){
+    const newPO=autoCascadeReqToPO(reqRecord);
+    if(newPO){
+      msgs.push(`PO ${newPO.number} auto-created (Open).`);
+      // Cascade PO → Invoice immediately
+      const newInv=autoCascadePOToInvoice(newPO);
+      if(newInv) msgs.push(`Invoice ${newInv.num} auto-created (Pending).`);
+    }
+  }
+
+  // Also handle any manually entered PO info in the modal
+  const poNum=(document.getElementById('f-req-po-number')?.value||'').trim();
+  const poStatus=document.getElementById('f-req-po-status')?.value||'';
+  if(poNum&&poStatus&&!reqRecord.linkedPoId){
+    const newPoId=uid();
+    const newPO={id:newPoId,grantId:reqRecord.grantId,grantYear:reqRecord.grantYear,number:poNum,
+      desc:reqRecord.desc,vendor:reqRecord.vendor,
+      amount:Number(document.getElementById('f-req-po-amount')?.value||amount),
+      enc:Number(document.getElementById('f-req-po-amount')?.value||amount),
+      status:poStatus,date:document.getElementById('f-req-po-date')?.value||new Date().toISOString().split('T')[0],
+      req:reqRecord.reqNumber,linkedReqId:reqRecord.id,linkedOrderId:reqRecord.linkedOrderId,attachments:[]};
+    state.pos.push(newPO);
+    reqRecord.linkedPoId=newPoId;
+    if(reqRecord.linkedOrderId){const ord=state.orders.find(x=>x.id===reqRecord.linkedOrderId);if(ord){ord.stages.po=true;ord.stages.poRef=poNum;}}
+    if(!msgs.find(m=>m.includes('PO'))) msgs.push(`PO ${poNum} saved and linked.`);
+    // Cascade: if this manually entered PO is Open, create invoice
+    if(['Open','Partially Received'].includes(poStatus)){
+      const newPORec=state.pos.find(p=>p.id===newPoId);
+      if(newPORec){const newInv=autoCascadePOToInvoice(newPORec);if(newInv&&!msgs.find(m=>m.includes('Invoice')))msgs.push(`Invoice ${newInv.num} auto-created (Pending).`);}
+    }
+  }
+
+  delete document.getElementById('f-req-grant').dataset.linkedOrderId;
+  state.stagingAttachments.req=[];closeModal('modal-req');
+  toastCascade(msgs);
+  refreshViews('requisitions');
+}
+
+function savePO(){
+  const num=document.getElementById('f-po-number').value.trim();if(!num){toast('PO number required.');return;}
+  let existingAtts=[];if(state.editingId){const p=state.pos.find(x=>x.id===state.editingId);existingAtts=p?.attachments||[];}
+  const attachments=[...existingAtts,...state.stagingAttachments.po];
+  const newStatus=document.getElementById('f-po-status').value;
+  const poData={
+    grantId:Number(document.getElementById('f-po-grant').value),
+    grantYear:document.getElementById('f-po-year').value||null,
+    number:num,
+    desc:document.getElementById('f-po-desc').value.trim(),
+    vendor:document.getElementById('f-po-vendor').value.trim(),
+    amount:Number(document.getElementById('f-po-amount').value)||0,
+    enc:Number(document.getElementById('f-po-enc').value)||0,
+    status:newStatus,
+    date:document.getElementById('f-po-date').value,
+    req:document.getElementById('f-po-req').value.trim(),
+    attachments
+  };
+
+  const wasOpen=state.editingId
+    ? ['Open','Partially Received'].includes(state.pos.find(x=>x.id===state.editingId)?.status)
+    : false;
+
+  let poRecord;
+  if(state.editingId){
+    poRecord=state.pos.find(x=>x.id===state.editingId);
+    const prevLinkedReqId=poRecord.linkedReqId,prevLinkedOrderId=poRecord.linkedOrderId;
+    Object.assign(poRecord,poData);
+    poRecord.linkedReqId=prevLinkedReqId;poRecord.linkedOrderId=prevLinkedOrderId;
+  } else {
+    const newId=uid();
+    poRecord={id:newId,...poData,linkedReqId:null,linkedOrderId:null};
+    // Try to auto-link to requisition by number
+    if(poData.req){
+      const r=state.requisitions.find(x=>x.reqNumber===poData.req);
+      if(r){poRecord.linkedReqId=r.id;poRecord.linkedOrderId=r.linkedOrderId;r.linkedPoId=newId;}
+    }
+    state.pos.push(poRecord);
+  }
+
+  const msgs=[state.editingId?'PO updated.':'PO saved.'];
+
+  // Auto-cascade: if PO is now Open/Partially Received and no invoice exists yet, create one
+  if(['Open','Partially Received'].includes(newStatus)&&!wasOpen){
+    const newInv=autoCascadePOToInvoice(poRecord);
+    if(newInv) msgs.push(`Invoice ${newInv.num} auto-created (Pending).`);
+  }
+
+  // Process any manually entered inline invoice rows
+  _poInvoiceRows.forEach(row=>{
+    if(!row.num) return;
+    if(row.existing&&row.id){
+      const inv=state.invoices.find(x=>x.id===row.id);
+      if(inv){inv.num=row.num;inv.amount=Number(row.amount||inv.amount);inv.date=row.date||inv.date;inv.due=row.due||inv.due;inv.desc=row.desc||inv.desc;inv.status=row.status||inv.status;}
+    } else if(!row.existing){
+      // Don't double-create if auto-cascade already made one
+      const alreadyExists=state.invoices.find(i=>i.linkedPoId===poRecord.id&&i.num===row.num);
+      if(!alreadyExists){
+        const newInv={id:uid(),grantId:poRecord.grantId,grantYear:poRecord.grantYear,num:row.num,vendor:poRecord.vendor,
+          po:poRecord.number,linkedPoId:poRecord.id,linkedOrderId:poRecord.linkedOrderId,
+          amount:Number(row.amount||0),status:row.status||'Pending',date:row.date||new Date().toISOString().split('T')[0],
+          due:row.due||'',desc:row.desc||poRecord.desc,attachments:[],payments:[]};
+        state.invoices.push(newInv);
+        if(poRecord.linkedOrderId){const ord=state.orders.find(x=>x.id===poRecord.linkedOrderId);if(ord){ord.stages.invoice=true;ord.stages.invoiceRef=row.num;}}
+        if(!msgs.find(m=>m.includes('Invoice'))) msgs.push(`Invoice ${row.num} added.`);
+      }
+    }
+  });
+
+  _poInvoiceRows=[];state.stagingAttachments.po=[];closeModal('modal-po');
+  toastCascade(msgs);
+  refreshViews('pos');
+}
+
+function saveInvoice(){
+  const num=document.getElementById('f-inv-num').value.trim();if(!num){toast('Invoice number required.');return;}
+  let existingAtts=[];if(state.editingId){const i=state.invoices.find(x=>x.id===state.editingId);existingAtts=i?.attachments||[];}
+  const attachments=[...existingAtts,...state.stagingAttachments.inv];
+  const poRef=document.getElementById('f-inv-po').value.trim();
+  // Try to find linked PO by number
+  const linkedPO=poRef?state.pos.find(p=>p.number===poRef):null;
+  const data={grantId:Number(document.getElementById('f-inv-grant').value),grantYear:document.getElementById('f-inv-year').value||null,num,
+    vendor:document.getElementById('f-inv-vendor').value.trim(),po:poRef,
+    linkedPoId:linkedPO?linkedPO.id:(state.editingId?state.invoices.find(x=>x.id===state.editingId)?.linkedPoId:null),
+    linkedOrderId:linkedPO?linkedPO.linkedOrderId:(state.editingId?state.invoices.find(x=>x.id===state.editingId)?.linkedOrderId:null),
+    amount:Number(document.getElementById('f-inv-amount').value)||0,status:document.getElementById('f-inv-status').value,
+    date:document.getElementById('f-inv-date').value,due:document.getElementById('f-inv-due').value,
+    desc:document.getElementById('f-inv-desc').value.trim(),payments:_payments.map(p=>({...p})),attachments};
+  if(state.editingId){Object.assign(state.invoices.find(x=>x.id===state.editingId),data);toast('Invoice updated.');}
+  else{state.invoices.push({id:uid(),...data});toast('Invoice saved.');}
+  state.stagingAttachments.inv=[];_payments=[];closeModal('modal-invoice');refreshViews('invoices');
+}
+
+function savePI(){
+  const first=document.getElementById('f-pi-first').value.trim(),last=document.getElementById('f-pi-last').value.trim();
+  if(!first||!last){toast('Name required.');return;}
+  const data={first,last,email:document.getElementById('f-pi-email').value.trim(),dept:document.getElementById('f-pi-dept').value.trim(),title:document.getElementById('f-pi-title').value.trim()};
+  if(state.editingId){Object.assign(state.pis.find(x=>x.id===state.editingId),data);toast('PI updated.');}
+  else{state.pis.push({id:uid(),...data});toast('PI added.');}
+  closeModal('modal-pi');renderPIs();
+}
+async function saveUser(){
+  const first=document.getElementById('f-user-first').value.trim(),last=document.getElementById('f-user-last').value.trim();
+  if(!first||!last){toast('Name required.');return;}
+  const grantIds=Array.from(document.getElementById('f-user-grants').selectedOptions).map(o=>Number(o.value));
+  const data={first,last,email:document.getElementById('f-user-email').value.trim(),role:document.getElementById('f-user-role').value,grantIds};
+  if(state.editingId){
+    // Update local state
+    const local=state.users.find(x=>x.id===state.editingId);
+    if(local) Object.assign(local,data);
+    // Persist to Firestore if this looks like a Firebase uid (string)
+    try{
+      const userDocId=String(state.editingId);
+      await updateDoc(doc(db,'users',userDocId),data);
+    }catch(e){ /* local-only user (seed data) — ignore Firestore error */ }
+    toast('User updated.');
+  } else {
+    state.users.push({id:uid(),...data,status:'active'});
+    toast('User added (local only — use Request Access for Firebase accounts).');
+  }
+  closeModal('modal-user');renderUsers();
+}
+
+function deleteRecord(type,id){
+  if(!confirm('Delete this record?'))return;
+  state[type]=state[type].filter(x=>x.id!==id);toast('Deleted.');
+  if(state.currentPage==='grant-detail'){grantTab(state.currentGrantTab);renderGrantDetail();}
+  else refreshViews(type);
+  if(state.currentPage==='dashboard')renderDashboard();
+}
+
+function refreshViews(type){
+  // Refresh drawer if open
+  if(_drawerOrderId) setTimeout(()=>refreshDrawer(), 80);
+  // If we're on the procurement page, re-render the currently active sub-tab
+  if(state.currentPage==='procurement'){
+    const subTab=state.currentProcSubTab||'chain';
+    if(subTab==='chain') renderProcurement();
+    else if(subTab==='efca') renderEFCA();
+    else if(subTab==='reqs') renderReqsInline();
+    else if(subTab==='pos') renderPOsInline();
+    else if(subTab==='invs') renderInvoicesInline();
+    // Also refresh chain if we changed a related record
+    if(subTab!=='chain') renderProcurement();
+  } else if(state.currentPage==='grant-detail'){
+    const t={orders:'procurement',requisitions:'reqs',pos:'pos',invoices:'invs'};
+    grantTab(t[type]||state.currentGrantTab);
+    renderGrantDetail();
+  }
+  if(state.currentPage==='dashboard') renderDashboard();
+}
+
+document.querySelectorAll('.modal-overlay').forEach(o=>{o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('open');});});
+
+
+// ═══════════════════════════════════════════════════════
+// FIREBASE SETUP
+// ═══════════════════════════════════════════════════════
+import { initializeApp }                           from 'https://www.gstatic.com/firebasejs/12.14.0/firebase-app.js';
+import { getAuth, createUserWithEmailAndPassword,
+         signInWithEmailAndPassword, signOut,
+         onAuthStateChanged }                       from 'https://www.gstatic.com/firebasejs/12.14.0/firebase-auth.js';
+import { getFirestore, doc, setDoc, getDoc,
+         updateDoc, collection, getDocs,
+         query, where, onSnapshot,
+         serverTimestamp }                          from 'https://www.gstatic.com/firebasejs/12.14.0/firebase-firestore.js';
+
+const firebaseConfig = {
+  apiKey:            'AIzaSyALrOwv0xyV_lsfRTTezyDS_9WhHWbfuwg',
+  authDomain:        'cbmhr-financial-management.firebaseapp.com',
+  projectId:         'cbmhr-financial-management',
+  storageBucket:     'cbmhr-financial-management.firebasestorage.app',
+  messagingSenderId: '946930528071',
+  appId:             '1:946930528071:web:2e78857d052f68215aa662'
+};
+
+const fbApp = initializeApp(firebaseConfig);
+const fbAuth = getAuth(fbApp);
+const db     = getFirestore(fbApp);
+
+// ═══════════════════════════════════════════════════════
+// AUTH & ACCESS CONTROL
+// ═══════════════════════════════════════════════════════
+const auth = { currentUser: null };   // holds the merged profile object
+
+function isAdmin(){ return auth.currentUser?.role === 'Admin'; }
+function isPI(){    return auth.currentUser?.role === 'PI'; }
+
+// No-op: passwords are now managed by Firebase Auth
+function initUserPasswords(){ /* handled by Firebase */ }
+
+// ── VISIBLE GRANTS for current user ──────────────────────────────────────
+function visibleGrants(){
+  if(!auth.currentUser) return [];
+  if(isAdmin()) return state.grants;
+  return state.grants.filter(g=>auth.currentUser.grantIds.includes(g.id));
+}
+
+// Scope a list of records by the user's visible grants
+function scopeByGrant(arr, grantField='grantId'){
+  if(!auth.currentUser) return [];
+  if(isAdmin()) return arr;
+  const ids = new Set(auth.currentUser.grantIds);
+  return arr.filter(r=>ids.has(r[grantField]));
+}
+
+// ── AUTH SCREEN TOGGLE ────────────────────────────────────────────────────
+function showAuthScreen(){
+  document.getElementById('auth-loading').style.display='none';
+  document.getElementById('auth-screen').style.display='flex';
+  document.querySelector('.app').style.display='none';
+  document.getElementById('pending-screen').classList.remove('show');
+}
+function hideAuthScreen(){
+  document.getElementById('auth-loading').style.display='none';
+  document.getElementById('auth-screen').style.display='none';
+  document.querySelector('.app').style.display='flex';
+  document.getElementById('pending-screen').classList.remove('show');
+}
+function showPendingScreen(user){
+  document.getElementById('auth-loading').style.display='none';
+  document.getElementById('auth-screen').style.display='none';
+  document.querySelector('.app').style.display='none';
+  document.getElementById('pending-screen').classList.add('show');
+  document.getElementById('pending-detail').textContent =
+    `Submitted by: ${user.first} ${user.last} (${user.email}) · Role: ${user.role}`;
+}
+
+function authTab(tab){
+  document.getElementById('tab-login').classList.toggle('active', tab==='login');
+  document.getElementById('tab-register').classList.toggle('active', tab==='register');
+  document.getElementById('login-form').style.display   = tab==='login'    ? '' : 'none';
+  document.getElementById('register-form').style.display = tab==='register' ? '' : 'none';
+  document.getElementById('login-error').classList.remove('show');
+  document.getElementById('reg-error').classList.remove('show');
+  document.getElementById('reg-success').classList.remove('show');
+}
+
+// ── LOGIN — Firebase Auth ─────────────────────────────────────────────────
+async function doLogin(){
+  const email = (document.getElementById('login-email').value||'').trim().toLowerCase();
+  const pw    = (document.getElementById('login-password').value||'');
+  const errEl = document.getElementById('login-error');
+  errEl.classList.remove('show');
+  if(!email||!pw){
+    errEl.textContent='Please enter your email and password.';
+    errEl.classList.add('show'); return;
+  }
+  const loginBtn = document.querySelector('#login-form .auth-btn');
+  try {
+    document.getElementById('login-email').disabled = true;
+    document.getElementById('login-password').disabled = true;
+    if(loginBtn){ loginBtn.textContent='Signing in…'; loginBtn.disabled=true; }
+    await signInWithEmailAndPassword(fbAuth, email, pw);
+    // onAuthStateChanged will handle the rest
+  } catch(e) {
+    document.getElementById('login-email').disabled = false;
+    document.getElementById('login-password').disabled = false;
+    if(loginBtn){ loginBtn.textContent='Sign In'; loginBtn.disabled=false; }
+    const friendlyMsgs = {
+      'auth/invalid-credential':     'Incorrect email or password.',
+      'auth/user-not-found':         'No account found with that email.',
+      'auth/wrong-password':         'Incorrect password.',
+      'auth/user-disabled':          'This account has been disabled.',
+      'auth/invalid-email':          'Please enter a valid email address.',
+      'auth/too-many-requests':      'Too many attempts. Please wait a moment and try again.',
+      'auth/network-request-failed': 'Network error. Check your internet connection.',
+      'auth/operation-not-allowed':  'Email/password sign-in is not enabled in Firebase Console. Go to Authentication → Sign-in method → Email/Password and enable it.',
+    };
+    const msg = friendlyMsgs[e.code] || `Error (${e.code||'unknown'}): ${e.message}`;
+    errEl.textContent = msg;
+    errEl.classList.add('show');
+  }
+}
+
+// ── REGISTER / REQUEST ACCESS — Firebase ─────────────────────────────────
+async function doRegister(){
+  const first  = (document.getElementById('reg-first').value||'').trim();
+  const last   = (document.getElementById('reg-last').value||'').trim();
+  const email  = (document.getElementById('reg-email').value||'').trim().toLowerCase();
+  const pw     = (document.getElementById('reg-password').value||'').trim();
+  const role   = document.getElementById('reg-role').value;
+  const dept   = (document.getElementById('reg-dept').value||'').trim();
+  const reason = (document.getElementById('reg-reason').value||'').trim();
+  const errEl  = document.getElementById('reg-error');
+  const okEl   = document.getElementById('reg-success');
+  errEl.classList.remove('show'); okEl.classList.remove('show');
+
+  if(!first||!last||!email||!pw){
+    errEl.textContent='Please fill in all required fields.';
+    errEl.classList.add('show'); return;
+  }
+  if(pw.length < 6){
+    errEl.textContent='Password must be at least 6 characters.';
+    errEl.classList.add('show'); return;
+  }
+
+  const regBtn = document.querySelector('#register-form .auth-btn');
+  if(regBtn){ regBtn.textContent='Submitting…'; regBtn.disabled=true; }
+  try {
+    // 1. Create Firebase Auth account
+    const cred = await createUserWithEmailAndPassword(fbAuth, email, pw);
+    const uid_fb = cred.user.uid;
+
+    // 2. Write user profile to Firestore (status = pending, no grants yet)
+    const profile = {
+      uid: uid_fb, first, last, email, role, dept, reason,
+      grantIds: [], status: 'pending',
+      requestedAt: new Date().toISOString().split('T')[0],
+      createdAt: serverTimestamp()
+    };
+    const profileRef = doc(db, 'users', uid_fb);
+    await setDoc(profileRef, profile);
+
+    // 3. Check if this is the first ever account → auto-promote to Admin + active
+    const wasPromoted = await checkAndBootstrapAdmin(uid_fb, profileRef);
+    if(wasPromoted){
+      profile.role = 'Admin';
+      profile.status = 'active';
+    }
+
+    // 4. Mirror into local state
+    const localUser = { id: uid_fb, ...profile };
+    state.users.push(localUser);
+    updateNotifDot();
+
+    // 5. If promoted to admin, let onAuthStateChanged log them straight in.
+    //    Otherwise sign out and make them wait for approval.
+    if(!wasPromoted) await signOut(fbAuth);
+
+    okEl.textContent = wasPromoted
+      ? 'Administrator account created! Signing you in…'
+      : 'Access request submitted! An administrator will review your request. You will receive access once approved.';
+    okEl.classList.add('show');
+    ['reg-first','reg-last','reg-email','reg-password','reg-dept','reg-reason'].forEach(id=>{
+      const el=document.getElementById(id); if(el) el.value='';
+    });
+  } catch(e) {
+    if(regBtn){ regBtn.textContent='Submit Access Request'; regBtn.disabled=false; }
+    const regMsgs = {
+      'auth/email-already-in-use':   'An account with that email already exists.',
+      'auth/invalid-email':          'Please enter a valid email address.',
+      'auth/weak-password':          'Password must be at least 6 characters.',
+      'auth/operation-not-allowed':  'Email/password sign-in is not enabled. Enable it in Firebase Console → Authentication → Sign-in method.',
+      'auth/network-request-failed': 'Network error. Check your internet connection.',
+    };
+    const msg = regMsgs[e.code] || `Error (${e.code||'unknown'}): ${e.message}`;
+    errEl.textContent = msg;
+    errEl.classList.add('show');
+  }
+}
+
+// ── LOGOUT — Firebase ────────────────────────────────────────────────────
+async function doLogout(){
+  await signOut(fbAuth);
+  auth.currentUser = null;
+  document.getElementById('pending-screen').classList.remove('show');
+  // Re-enable login inputs in case they were disabled
+  ['login-email','login-password'].forEach(id=>{
+    const el=document.getElementById(id); if(el) el.disabled=false;
+  });
+  showAuthScreen();
+  authTab('login');
+}
+
+// ── LOAD USER PROFILE FROM FIRESTORE ─────────────────────────────────────
+// If a user exists in Firebase Auth but has no Firestore profile
+// (e.g. created manually in the Firebase Console), we auto-create one.
+// The first account ever (no system/config doc) becomes Admin automatically.
+async function loadUserProfile(firebaseUser){
+  const ref = doc(db, 'users', firebaseUser.uid);
+  let snap = await getDoc(ref);
+
+  if(!snap.exists()){
+    // No profile yet — build one from the Firebase Auth account
+    const emailName = (firebaseUser.email||'').split('@')[0];
+    const nameParts = (firebaseUser.displayName||emailName).split(' ');
+    const autoProfile = {
+      uid:   firebaseUser.uid,
+      first: nameParts[0] || emailName,
+      last:  nameParts.slice(1).join(' ') || '',
+      email: firebaseUser.email || '',
+      role:  'Researcher',      // default — may be overridden to Admin below
+      dept:  '',
+      reason:'Created via Firebase Console',
+      grantIds: [],
+      status: 'pending',        // default — may be overridden to active below
+      requestedAt: new Date().toISOString().split('T')[0],
+      createdAt: serverTimestamp()
+    };
+
+    await setDoc(ref, autoProfile);
+
+    // Check if this is the first ever account → promote to Admin + active
+    const wasPromoted = await checkAndBootstrapAdmin(firebaseUser.uid, ref);
+    if(wasPromoted){
+      autoProfile.role   = 'Admin';
+      autoProfile.status = 'active';
+    }
+
+    // Re-read after potential update
+    snap = await getDoc(ref);
+  }
+
+  const data = snap.data();
+  return { id: firebaseUser.uid, ...data };
+}
+
+// ── SYNC ALL USERS FROM FIRESTORE (admin view) ───────────────────────────
+async function syncUsersFromFirestore(){
+  try {
+    const snap = await getDocs(collection(db, 'users'));
+    snap.forEach(d=>{
+      const data = { id: d.id, ...d.data() };
+      const existing = state.users.findIndex(u=>u.id===d.id);
+      if(existing>=0) state.users[existing]=data;
+      else state.users.push(data);
+    });
+  } catch(e){ console.warn('Could not sync users:', e.message); }
+}
+
+// ── FIREBASE AUTH STATE OBSERVER ─────────────────────────────────────────
+// This is the single source of truth for session state.
+onAuthStateChanged(fbAuth, async (firebaseUser) => {
+  if(!firebaseUser){
+    // Signed out
+    auth.currentUser = null;
+    showAuthScreen();
+    return;
+  }
+
+  // Signed in — load Firestore profile
+  const profile = await loadUserProfile(firebaseUser);
+  if(!profile) return;
+
+  auth.currentUser = profile;
+
+  // Sync local state user list entry
+  const idx = state.users.findIndex(u=>u.id===profile.id);
+  if(idx>=0) state.users[idx]=profile; else state.users.push(profile);
+
+  // Check account status
+  if(profile.status==='pending'){
+    showPendingScreen(profile);
+    return;
+  }
+  if(profile.status==='rejected'){
+    await signOut(fbAuth);
+    const errEl=document.getElementById('login-error');
+    if(errEl){ errEl.textContent='Your access request was not approved. Contact an administrator.'; errEl.classList.add('show'); }
+    showAuthScreen();
+    return;
+  }
+
+  // Active user — show the app
+  hideAuthScreen();
+
+  // If admin, sync all users from Firestore so the approval panel is populated
+  if(profile.role==='Admin') await syncUsersFromFirestore();
+
+  applyAuthToUI();
+  navigate('dashboard');
+  // Re-enable login inputs
+  ['login-email','login-password'].forEach(id=>{
+    const el=document.getElementById(id); if(el) el.disabled=false;
+  });
+  toast(`Welcome back, ${profile.first}!`);
+});
+
+// ── APPLY AUTH TO UI ──────────────────────────────────────────────────────
+function applyAuthToUI(){
+  const u = auth.currentUser;
+  if(!u) return;
+
+  document.querySelector('.sidebar-user .user-avatar').textContent =
+    `${(u.first||'?')[0]}${(u.last||'?')[0]}`.toUpperCase();
+  document.querySelector('.sidebar-user .name').textContent = `${u.first} ${u.last}`;
+  document.querySelector('.sidebar-user .role').textContent = u.role;
+
+  const adminOnly = ['pis','users'];
+  document.querySelectorAll('.nav-item').forEach(n=>{
+    const oc = n.getAttribute('onclick')||'';
+    const isAdminNav = adminOnly.some(p=>oc.includes(`navigate('${p}')`));
+    if(isAdminNav) n.style.display = isAdmin() ? '' : 'none';
+  });
+  document.querySelectorAll('.sidebar-section-label').forEach(l=>{
+    if(l.textContent.trim()==='Admin') l.style.display = isAdmin()?'':'none';
+  });
+
+  // Sign-out button in topbar
+  if(!document.getElementById('signout-btn')){
+    const soBtn = document.createElement('button');
+    soBtn.id='signout-btn'; soBtn.className='btn btn-secondary btn-sm';
+    soBtn.textContent='Sign Out'; soBtn.onclick=doLogout;
+    document.getElementById('topbarActions').before(soBtn);
+  }
+  updateNotifDot();
+}
+
+// ── NOTIFICATION DOT ──────────────────────────────────────────────────────
+function updateNotifDot(){
+  const pending = state.users.filter(u=>u.status==='pending').length;
+  const dot = document.getElementById('req-notif');
+  if(!dot) return;
+  dot.textContent = pending;
+  dot.style.display = (isAdmin() && pending > 0) ? 'inline-flex' : 'none';
+}
+
+// ── ADMIN: RENDER ACCESS REQUESTS ─────────────────────────────────────────
+function renderAccessRequests(){
+  const pending = state.users.filter(u=>u.status==='pending');
+  if(!pending.length) return '';
+  return `
+    <div style="border:2px solid var(--amber);border-radius:10px;overflow:hidden;margin-bottom:24px">
+      <div style="background:var(--amber-light);padding:12px 18px;">
+        <span style="font-weight:600;color:var(--amber);font-size:13px">⏳ Pending Access Requests (${pending.length})</span>
+      </div>
+      <table style="width:100%;border-collapse:collapse">
+        <thead><tr>
+          <th>Name</th><th>Email</th><th>Role</th><th>Dept</th><th>Requested</th><th>Reason</th><th>Grant Access</th><th>Actions</th>
+        </tr></thead>
+        <tbody>${pending.map(u=>`<tr>
+          <td><strong>${u.first} ${u.last}</strong></td>
+          <td style="color:var(--gray-600)">${u.email}</td>
+          <td>${badge(u.role)}</td>
+          <td style="color:var(--gray-600)">${u.dept||'—'}</td>
+          <td style="font-size:12px">${u.requestedAt||'—'}</td>
+          <td style="font-size:12px;color:var(--gray-600);max-width:180px">${u.reason||'—'}</td>
+          <td>
+            <select id="grant-sel-${u.id}" multiple
+              style="height:72px;width:160px;font-size:12px;border:var(--border);border-radius:6px;padding:3px">
+              ${state.grants.map(g=>`<option value="${g.id}">${g.grantId}</option>`).join('')}
+            </select>
+          </td>
+          <td style="white-space:nowrap">
+            <button class="btn btn-green btn-sm" onclick="approveUser('${u.id}')">✓ Approve</button><br>
+            <button class="btn btn-sm" style="background:var(--red-light);color:var(--red);margin-top:4px"
+              onclick="rejectUser('${u.id}')">✕ Reject</button>
+          </td>
+        </tr>`).join('')}
+        </tbody>
+      </table>
+    </div>`;
+}
+
+// ── APPROVE USER — write to Firestore ────────────────────────────────────
+async function approveUser(userId){
+  const u = state.users.find(x=>x.id===userId);
+  if(!u) return;
+  const sel = document.getElementById(`grant-sel-${userId}`);
+  const grantIds = sel ? Array.from(sel.selectedOptions).map(o=>Number(o.value)) : [];
+  try {
+    await updateDoc(doc(db,'users',String(userId)), { status:'active', grantIds });
+    u.status='active'; u.grantIds=grantIds;
+    updateNotifDot(); renderUsers();
+    toast(`${u.first} ${u.last} approved — ${grantIds.length} grant(s) assigned.`);
+  } catch(e){ toast('Error approving user: '+e.message); }
+}
+
+// ── REJECT USER — write to Firestore ─────────────────────────────────────
+async function rejectUser(userId){
+  const u = state.users.find(x=>x.id===userId);
+  if(!u||!confirm(`Reject access request from ${u.first} ${u.last}?`)) return;
+  try {
+    await updateDoc(doc(db,'users',String(userId)), { status:'rejected' });
+    u.status='rejected';
+    updateNotifDot(); renderUsers();
+    toast(`Access request from ${u.first} ${u.last} rejected.`);
+  } catch(e){ toast('Error rejecting user: '+e.message); }
+}
+
+// ── FIRST-ACCOUNT ADMIN BOOTSTRAP ────────────────────────────────────────
+// The very first account becomes Admin. A sentinel doc at system/config
+// tracks whether the system has been initialized.
+async function checkAndBootstrapAdmin(uid_fb, profileRef){
+  try {
+    const cfgRef = doc(db, 'system', 'config');
+    let cfgSnap;
+    try { cfgSnap = await getDoc(cfgRef); }
+    catch(e){
+      // If we can't read system/config (permissions), assume not first user
+      console.warn('system/config read failed:', e.message);
+      return false;
+    }
+    if(!cfgSnap.exists()){
+      // First ever account → promote to Admin
+      await setDoc(profileRef, { role:'Admin', status:'active' }, { merge: true });
+      await setDoc(cfgRef, {
+        initialized: true,
+        firstAdminUid: uid_fb,
+        createdAt: serverTimestamp()
+      });
+      return true;
+    }
+    return false;
+  } catch(e){
+    console.warn('Bootstrap check failed:', e.message);
+    return false;
+  }
+}
+
+// ── EXPOSE FUNCTIONS TO GLOBAL SCOPE (required for onclick= in ES modules) ──
+// ES module scripts are not global, so HTML onclick= attributes can't find
+// functions defined here. We attach them explicitly to window.
+const _globals = {
+  // Auth
+  doLogin, doLogout, doRegister, authTab,
+  // Navigation
+  navigate, grantTab, setGrantYear, procSubTab,
+  // Modals
+  openNewModal, openEditRecord, closeModal, closeChainDrawer, openChainDrawer,
+  openNewReqForOrder, openEnterPOOnReq, openEnterInvoiceOnPO,
+  // Data actions
+  saveGrant, saveOrder, saveReq, savePO, saveInvoice, savePI, saveUser,
+  deleteRecord, approveUser, rejectUser,
+  // Procurement chain
+  toggleProcCard, scrollToProcCard, toggleDashBlock,
+  // Invoice & PO builders
+  addPaymentRow, removePayment, updateInvSummary, addPOInvoiceRow, removePOInvoiceRow,
+  // Attachments
+  dzDragOver, dzDragLeave, dzDrop, handleFileInput,
+  // Filters
+  renderProcurement, renderEFCA, renderReqsInline, renderPOsInline, renderInvoicesInline,
+  renderGrants, renderReqs, renderPOs, renderInvoices, renderUsers, renderPIs,
+  // Stage UI
+  refreshStageUI, onStageCheck: refreshStageUI,
+  // Year budget
+  buildYearRows, updateYearTotal,
+  // Grant year sync
+  syncYearSelect,
+};
+Object.assign(window, _globals);
+
+// ── INIT ──────────────────────────────────────────────────────────────────
+seedData();
+// Mark seed users active (they live only in local memory as demo data)
+state.users.forEach(u=>{ if(!u.status) u.status='active'; if(!u.password) u.password='demo'; });
+// Keep the loading overlay visible; hide the app shell and auth screen
+// until onAuthStateChanged fires (prevents flash of empty UI)
+document.getElementById('auth-screen').style.display='none';
+document.querySelector('.app').style.display='none';
+// onAuthStateChanged will call showAuthScreen() or hideAuthScreen() once Firebase responds
+
+</script>
+
+<!-- ═══ CHAIN DETAIL DRAWER ═══ -->
+<div class="chain-drawer-overlay" id="chain-drawer-overlay" onclick="closeChainDrawer()"></div>
+<div class="chain-drawer" id="chain-drawer">
+  <div class="chain-drawer-header">
+    <div>
+      <div class="chain-drawer-title" id="cd-title">Procurement Chain</div>
+      <div class="chain-drawer-meta" id="cd-meta"></div>
+    </div>
+    <button class="chain-drawer-close" onclick="closeChainDrawer()">×</button>
+  </div>
+  <div class="chain-drawer-body" id="cd-body"></div>
+</div>
+
+
+<!-- ═══ AUTH LOADING OVERLAY ═══ -->
+<div class="auth-loading" id="auth-loading">
+  <div class="auth-loading-spinner"></div>
+  <div class="auth-loading-text">Checking session…</div>
+</div>
+
+<!-- ═══ LOGIN / REGISTER SCREEN ═══ -->
+<div class="auth-screen" id="auth-screen">
+  <div class="auth-card">
+    <div class="auth-logo">GrantTrack</div>
+    <div class="auth-sub">University Financial System</div>
+    <div class="auth-tabs">
+      <div class="auth-tab active" id="tab-login" onclick="authTab('login')">Sign In</div>
+      <div class="auth-tab" id="tab-register" onclick="authTab('register')">Request Access</div>
+    </div>
+
+    <!-- LOGIN FORM -->
+    <div id="login-form" class="auth-form">
+      <div class="auth-error" id="login-error"></div>
+      <div class="form-field"><label>Email Address</label><input id="login-email" type="email" placeholder="you@university.edu" autocomplete="email"></div>
+      <div class="form-field"><label>Password</label><input id="login-password" type="password" placeholder="••••••••" autocomplete="current-password"></div>
+      <button class="auth-btn auth-btn-primary" onclick="doLogin()">Sign In</button>
+      <div class="auth-hint">
+        Don't have an account? Switch to the <strong>Request Access</strong> tab to register.<br>
+        The first account registered automatically becomes the system administrator.
+      </div>
+    </div>
+
+    <!-- REGISTER FORM -->
+    <div id="register-form" class="auth-form" style="display:none">
+      <div class="auth-error" id="reg-error"></div>
+      <div class="auth-success" id="reg-success"></div>
+      <div class="form-field"><label>First Name</label><input id="reg-first" placeholder="Jane"></div>
+      <div class="form-field"><label>Last Name</label><input id="reg-last" placeholder="Smith"></div>
+      <div class="form-field"><label>Email Address</label><input id="reg-email" type="email" placeholder="you@university.edu"></div>
+      <div class="form-field"><label>Password</label><input id="reg-password" type="password" placeholder="Choose a password"></div>
+      <div class="form-field"><label>Role / Department</label>
+        <select id="reg-role"><option value="Researcher">Researcher</option><option value="Finance">Finance</option><option value="PI">Principal Investigator</option></select>
+      </div>
+      <div class="form-field"><label>Department</label><input id="reg-dept" placeholder="e.g. Biochemistry"></div>
+      <div class="form-field"><label>Reason / Grant Access Needed</label><input id="reg-reason" placeholder="Brief description of your role and grants you need access to"></div>
+      <button class="auth-btn auth-btn-primary" onclick="doRegister()">Submit Access Request</button>
+      <div class="auth-hint">Your request will be reviewed by an administrator before access is granted.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ PENDING APPROVAL SCREEN ═══ -->
+<div class="pending-screen" id="pending-screen">
+  <div class="pending-card">
+    <div class="pending-icon">⏳</div>
+    <h2>Access Pending Approval</h2>
+    <p>Your access request has been submitted and is awaiting administrator review. You will be able to sign in once your account has been approved and grants have been assigned to you.</p>
+    <p id="pending-detail" style="font-size:12px;color:var(--gray-400)"></p>
+    <button class="btn btn-secondary" onclick="doLogout()">Sign Out</button>
+  </div>
+</div>
+
+<!-- ═══ ACCESS REQUESTS MODAL (Admin) ═══ -->
+<div class="modal-overlay" id="modal-access-requests">
+  <div class="modal modal-lg">
+    <div class="modal-header">
+      <h2>Access Requests</h2>
+      <button class="modal-close" onclick="closeModal('modal-access-requests')">×</button>
+    </div>
+    <div class="modal-body" id="access-requests-body" style="padding:0"></div>
+  </div>
+</div>
+
+</body>
+</html>
