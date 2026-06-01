@@ -708,14 +708,128 @@ textarea{resize:vertical;min-height:68px;}
         <div class="form-field"><label>Grant ID / Award #</label><input id="f-grant-id" placeholder="e.g. R01CA123456"></div>
         <div class="form-field"><label>Sponsor / Agency</label><input id="f-grant-sponsor"></div>
         <div class="form-field"><label>Principal Investigator</label><select id="f-grant-pi"></select></div>
-        <div class="form-field"><label>Status</label><select id="f-grant-status"><option>Active</option><option>Pending</option><option>Closed</option></select></div>
-        <div class="form-field"><label>Start Date</label><input id="f-grant-start" type="date" onchange="buildYearRows()"></div>
-        <div class="form-field"><label>End Date</label><input id="f-grant-end" type="date" onchange="buildYearRows()"></div>
-        <div class="form-field span-2"><label>Notes</label><textarea id="f-grant-notes" style="min-height:52px"></textarea></div>
-        <div class="form-section-label">Annual Budgets</div>
-        <div class="form-hint span-2" style="margin-top:-8px">Budget per grant year. Enter start/end dates above to auto-generate rows.</div>
-        <div id="yearBudgetRows" class="span-2" style="display:flex;flex-direction:column;gap:8px;"></div>
-        <div class="form-field span-2" style="flex-direction:row;align-items:center;justify-content:space-between;margin-top:4px">
+<script type="module">
+  // Import the primary Firebase app module
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-app.js";
+  
+  // Import the essential tools for authenticating users and managing the database
+  import { 
+    getAuth, 
+    signInWithEmailAndPassword, 
+    createUserWithEmailAndPassword, 
+    onAuthStateChanged, 
+    signOut 
+  } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-auth.js";
+  
+  import { 
+    getFirestore, 
+    doc, 
+    setDoc, 
+    getDoc 
+  } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-firestore.js";
+
+  // Your unique Firebase credentials configuration
+  const firebaseConfig = {
+    apiKey: "AIzaSyALrOwv0xyV_lsfRTTezyDS_9WhHWbfuwg",
+    authDomain: "cbmhr-financial-management.firebaseapp.com",
+    projectId: "cbmhr-financial-management",
+    storageBucket: "cbmhr-financial-management.firebasestorage.app",
+    messagingSenderId: "946930528071",
+    appId: "1:946930528071:web:2e78857d052f68215aa662"
+  };
+
+  // Turn on Firebase links using the exact names your file relies on
+  const app = initializeApp(firebaseConfig);
+  const fbAuth = getAuth(app);
+  const db = getFirestore(app);
+
+  // Expose methods to the browser window so your HTML button actions run successfully
+  window.doLogin = async function() {
+    const email = document.getElementById('login-email').value;
+    const pass = document.getElementById('login-pass').value;
+    if(!email || !pass) return alert('Please enter email and password');
+    
+    try {
+      await signInWithEmailAndPassword(fbAuth, email, pass);
+    } catch(err) {
+      alert('Login failed: ' + err.message);
+    }
+  };
+
+  window.doRegister = async function() {
+    const name = document.getElementById('reg-name').value;
+    const email = document.getElementById('reg-email').value;
+    const pass = document.getElementById('reg-pass').value;
+    const dept = document.getElementById('reg-dept').value;
+    const reason = document.getElementById('reg-reason').value;
+
+    if(!name || !email || !pass) return alert('Name, Email, and Password are required');
+
+    try {
+      // Step A: Register the user profile inside the auth system
+      const res = await createUserWithEmailAndPassword(fbAuth, email, pass);
+      const uid = res.user.uid;
+
+      // Step B: Automatically build their approval state folder inside the Database
+      await setDoc(doc(db, "users", uid), {
+        uid: uid,
+        name: name,
+        email: email,
+        department: dept || "",
+        reason: reason || "",
+        role: "user",
+        approved: false, // Starts disabled until authorized by admin
+        createdAt: new Date().toISOString()
+      });
+      
+    } catch(err) {
+      alert('Registration failed: ' + err.message);
+    }
+  };
+
+  window.doLogout = async function() {
+    try {
+      await signOut(fbAuth);
+      location.reload();
+    } catch(err) {
+      console.error(err);
+    }
+  };
+
+  // Watch security session changes continuously (fires on initial setup, log ins, and log outs)
+  onAuthStateChanged(fbAuth, async (user) => {
+    if (user) {
+      // Authenticated session caught, dismiss entry portal layout
+      document.getElementById('auth-screen').style.display = 'none';
+      
+      try {
+        // Read database profile status information
+        const userDoc = await getDoc(doc(db, "users", user.uid));
+        
+        if(userDoc.exists() && userDoc.data().approved === true) {
+          // Access unlocked! Forward past holding zone directly to application dashboard
+          document.getElementById('pending-screen').style.display = 'none';
+          document.getElementById('app-layout').style.display = 'flex';
+        } else {
+          // Profile exists but administrative approval check is false or missing
+          document.getElementById('app-layout').style.display = 'none';
+          document.getElementById('pending-screen').style.display = 'flex';
+          document.getElementById('pending-detail').innerText = `User ID: ${user.uid} (${user.email})`;
+        }
+      } catch(e) {
+        console.error("Database permission rules configuration hold:", e);
+        // Fallback safety to pending interface layout if rules block initial load
+        document.getElementById('pending-screen').style.display = 'flex';
+      }
+    } else {
+      // Clean system profile or session log out — direct interface back to credential landing panel
+      document.getElementById('app-layout').style.display = 'none';
+      document.getElementById('pending-screen').style.display = 'none';
+      document.getElementById('auth-screen').style.display = 'flex';
+    }
+  });
+</script>
+                
           <span style="font-size:13px;color:var(--gray-600)">Total: <span id="yearBudgetTotal" style="font-family:'DM Mono',monospace;font-weight:600;color:var(--ink)">$0.00</span></span>
         </div>
       </div>
@@ -2976,7 +3090,7 @@ document.querySelector('.app').style.display='none';
       <div class="auth-error" id="login-error"></div>
       <div class="form-field"><label>Email Address</label><input id="login-email" type="email" placeholder="you@university.edu" autocomplete="email"></div>
       <div class="form-field"><label>Password</label><input id="login-password" type="password" placeholder="••••••••" autocomplete="current-password"></div>
-      <button class="auth-btn auth-btn-primary" onclick="doLogin()">Sign In</button>
+      <button type="button" class="auth-btn auth-btn-primary" onclick="doLogin()">Sign In</button>
       <div class="auth-hint">
         Don't have an account? Switch to the <strong>Request Access</strong> tab to register.<br>
         The first account registered automatically becomes the system administrator.
@@ -2996,7 +3110,7 @@ document.querySelector('.app').style.display='none';
       </div>
       <div class="form-field"><label>Department</label><input id="reg-dept" placeholder="e.g. Biochemistry"></div>
       <div class="form-field"><label>Reason / Grant Access Needed</label><input id="reg-reason" placeholder="Brief description of your role and grants you need access to"></div>
-      <button class="auth-btn auth-btn-primary" onclick="doRegister()">Submit Access Request</button>
+      <button type="button" class="auth-btn auth-btn-primary" onclick="doRegister()">Submit Access Request</button>
       <div class="auth-hint">Your request will be reviewed by an administrator before access is granted.</div>
     </div>
   </div>
