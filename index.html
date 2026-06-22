@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
-<title>LabProcure — Research Purchasing &amp; Order Tracking</title>
+<title>CBMHR Order Tracking System (COTS) — Research Purchasing &amp; Order Tracking</title>
 
 <!-- Fonts -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -24,7 +24,7 @@
 
 <style>
 /* ============================================================
-   LabProcure — design tokens
+   CBMHR Order Tracking System (COTS) — design tokens
    ============================================================ */
 :root{
   --bg:                #FFFFFF;
@@ -472,7 +472,7 @@ table.tbl tbody tr:last-child td{border-bottom:none;}
   <div class="auth-wrap">
     <div class="auth-brandpane">
       <div>
-        <div class="auth-wordmark">LabProcure<sup>EFCA</sup></div>
+        <div class="auth-wordmark">CBMHR Order Tracking System (COTS)</div>
         <div class="auth-tagline">Purchase requests, approvals, and order tracking for grant-funded research labs — from request to received, in one place.</div>
       </div>
       <div class="auth-stages">
@@ -554,7 +554,7 @@ table.tbl tbody tr:last-child td{border-bottom:none;}
 <div id="appShell">
   <aside class="sidebar" id="sidebar">
     <div class="sidebar-head">
-      <div class="sidebar-wordmark">LabProcure<sup>EFCA</sup></div>
+      <div class="sidebar-wordmark">CBMHR Order Tracking System (COTS)</div>
       <div class="sidebar-org" id="sidebarOrg">Research Purchasing Tracker</div>
     </div>
 
@@ -969,20 +969,20 @@ const Email = {
     if(!piSnap.exists) return;
     const pi = piSnap.data();
     await Email.send(pi.contactEmail || pi.email,
-      `[LabProcure] Approval needed: ${req.requestNumber}`,
-      `Hi ${pi.name},\n\nA purchase request requires your EFCA approval:\n\nRequest #: ${req.requestNumber}\nVendor: ${req.vendorName}\nAmount: ${Utils.fmtMoney(req.totalCost)}\nRequester: ${req.requesterName}\n\nPlease log in to LabProcure to review.\n\nThank you.`
+      `[COTS] Approval needed: ${req.requestNumber}`,
+      `Hi ${pi.name},\n\nA purchase request requires your EFCA approval:\n\nRequest #: ${req.requestNumber}\nVendor: ${req.vendorName}\nAmount: ${Utils.fmtMoney(req.totalCost)}\nRequester: ${req.requesterName}\n\nPlease log in to COTS to review.\n\nThank you.`
     );
   },
   async notifyStatusChange(req, oldStatus, newStatus, recipientEmail, recipientName){
     await Email.send(recipientEmail,
-      `[LabProcure] Request ${req.requestNumber} status updated`,
-      `Hi ${recipientName},\n\nYour purchase request status has changed:\n\nRequest #: ${req.requestNumber}\nVendor: ${req.vendorName}\nPrevious status: ${stageLabel(oldStatus)}\nNew status: ${stageLabel(newStatus)}\n\nLog in to LabProcure for details.`
+      `[COTS] Request ${req.requestNumber} status updated`,
+      `Hi ${recipientName},\n\nYour purchase request status has changed:\n\nRequest #: ${req.requestNumber}\nVendor: ${req.vendorName}\nPrevious status: ${stageLabel(oldStatus)}\nNew status: ${stageLabel(newStatus)}\n\nLog in to COTS for details.`
     );
   },
   async notifyOverdue(req, recipientEmail, recipientName){
     await Email.send(recipientEmail,
-      `[LabProcure] OVERDUE: Request ${req.requestNumber}`,
-      `Hi ${recipientName},\n\nThis purchase request is overdue:\n\nRequest #: ${req.requestNumber}\nVendor: ${req.vendorName}\nDue date: ${Utils.fmtDate(req.dueDate)}\nCurrent status: ${stageLabel(req.status)}\n\nPlease take action in LabProcure.`
+      `[COTS] OVERDUE: Request ${req.requestNumber}`,
+      `Hi ${recipientName},\n\nThis purchase request is overdue:\n\nRequest #: ${req.requestNumber}\nVendor: ${req.vendorName}\nDue date: ${Utils.fmtDate(req.dueDate)}\nCurrent status: ${stageLabel(req.status)}\n\nPlease take action in COTS.`
     );
   }
 };
@@ -1192,7 +1192,7 @@ const Router = {
       grants:    ['Grants','Manage grant accounts and balances'],
       users:     ['Users','Manage team members and roles'],
       audit:     ['Audit Trail','Complete log of all system actions'],
-      help:      ['User Manual','How to use LabProcure'],
+      help:      ['User Manual','How to use COTS'],
       settings:  ['Settings','Profile, data download, and system configuration'],
     };
     const [title, sub] = titles[route] || [route, ''];
@@ -3078,7 +3078,7 @@ const Views = {
         const filtered = filter==='active'  ? allReqs.filter(r=>![TERMINAL_STATUS,'cancelled'].includes(r.status))
                        : filter==='completed'? allReqs.filter(r=>r.status===TERMINAL_STATUS)
                        : allReqs;
-        filename = `LabProcure_Requests_${filter}_${now}.csv`;
+        filename = `COTS_Requests_${filter}_${now}.csv`;
         rows.push(['Request #','Request Date','Due Date','Requester','PI','Grant','Vendor',
           'Item Description','Quantity','Unit Cost ($)','Total Cost ($)','Status',
           'Requisition #','PO #','Invoice #','Received Qty',
@@ -3097,7 +3097,7 @@ const Views = {
       } else if(type==='grants'){
         const grants = await Data.getGrants();
         const allReqs = await Data.getRequests();
-        filename = `LabProcure_Grants_${now}.csv`;
+        filename = `COTS_Grants_${now}.csv`;
         rows.push(['Grant Name','Grant Number','PI','Budget ($)','Committed ($)','Remaining ($)',
           'Status','Start Date','End Date','Notes']);
         for(const g of grants){
@@ -3113,7 +3113,7 @@ const Views = {
       } else if(type==='spending'){
         const grants = await Data.getGrants();
         const allReqs = await Data.getRequests();
-        filename = `LabProcure_Spending_Summary_${now}.csv`;
+        filename = `COTS_Spending_Summary_${now}.csv`;
         rows.push(['Grant','Grant Number','PI','Budget ($)',
           'Total Committed ($)','Total Completed ($)','Remaining ($)',
           'Active Requests','Completed Requests']);
@@ -3132,7 +3132,7 @@ const Views = {
         }
       } else if(type==='audit'){
         const audits = await Data.getAudit(1000);
-        filename = `LabProcure_Audit_${now}.csv`;
+        filename = `COTS_Audit_${now}.csv`;
         rows.push(['Timestamp','User','Email','Action','Request #']);
         for(const a of audits){
           rows.push([
@@ -3210,9 +3210,9 @@ const Views = {
       <div class="content-narrow" style="max-width:760px;">
         ${roleIntro[role]||''}
 
-        ${section('What is LabProcure?','📋',`
+        ${section('What is COTS?','📋',`
           <p style="font-size:13.5px;color:var(--text-muted);margin:0 0 10px;">
-            LabProcure is a purchasing and order-tracking system designed for grant-funded research labs.
+            COTS is a purchasing and order-tracking system designed for grant-funded research labs.
             It tracks every purchase from initial request through EFCA approval, requisition, purchase order,
             goods receipt, and invoice — giving Administrators, PIs, and Researchers a live view of where
             every order stands.
@@ -3318,7 +3318,7 @@ const Views = {
     `);
 
     content += section('Reminders & Notifications','🔔',`
-      <p style="font-size:13.5px;margin:0 0 10px;">LabProcure sends automatic emails at key moments:</p>
+      <p style="font-size:13.5px;margin:0 0 10px;">COTS sends automatic emails at key moments:</p>
       <ul style="font-size:13.5px;color:var(--text-muted);margin:0 0 12px;padding-left:20px;">
         <li style="margin-bottom:6px;"><strong>New request submitted</strong> — PI receives an approval notification</li>
         <li style="margin-bottom:6px;"><strong>Status changes</strong> — Requester is notified at each stage advance</li>
@@ -3436,8 +3436,8 @@ async function checkReminders(){
     for(const d of snap.docs){
       const r = d.data();
       if(!(r.date <= today)) continue;
-      await Email.send(r.email, `[LabProcure] Reminder: ${r.requestNumber}`,
-        `Hi ${r.name},\n\nThis is your follow-up reminder for request ${r.requestNumber}.\n${r.note||''}\n\nPlease check LabProcure for the latest status.`);
+      await Email.send(r.email, `[COTS] Reminder: ${r.requestNumber}`,
+        `Hi ${r.name},\n\nThis is your follow-up reminder for request ${r.requestNumber}.\n${r.note||''}\n\nPlease check COTS for the latest status.`);
       await d.ref.delete(); // one-shot reminder
       Toast.warn(`Follow-up reminder sent for ${r.requestNumber}.`);
     }
